@@ -1,0 +1,4526 @@
+<!DOCTYPE html>
+<!-- ==================================================
+  "SECTION 01 · DOCUMENT ROOT"
+  Base HTML shell and language declaration
+================================================== -->
+<html lang="en">
+<head>
+<!-- ==================================================
+  "SECTION 02 · HEAD METADATA + EXTERNAL ASSETS"
+================================================== -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Task PAL prototype for supporting employees returning from extended leave.">
+<meta name="theme-color" content="#1E1E1E">
+
+<title>Task PAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==================================================
+   "SECTION 03 · GLOBAL STYLESHEET"
+================================================== */
+
+/* ===== 03A · Reset + design tokens ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F7F5F0;--surface:#FFFFFF;--dark:#1E1E1E;--mid:#6B6560;--border:#E2DDD7;
+  --knowledge:#4A8C6F;--tasks:#5B8DB8;--confidence:#C0695A;--connection:#7B6E8A;
+  --phase1:#5B8DB8;--phase2:#E8A87C;--phase3:#4A8C6F;--radius:12px;
+  --shadow:0 2px 16px rgba(0,0,0,0.07);--success:#3E7C5D;
+}
+html{font-size:calc(16px * var(--font-scale, 1));scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);min-height:100vh;line-height:1.6}
+.skip-link{position:absolute;top:-100px;left:16px;background:var(--dark);color:white;padding:10px 18px;border-radius:6px;font-weight:600;font-size:0.875rem;z-index:9999;transition:top .2s;text-decoration:none}
+.skip-link:focus{top:16px}
+*:focus-visible{outline:3px solid var(--tasks);outline-offset:3px;border-radius:4px}
+
+
+/* ===== 03B · Accessibility toolbar ===== */
+.a11y-bar{
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  z-index:1000;
+  padding:8px 10px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background:rgba(255,255,255,.88);
+  border:1px solid rgba(255,255,255,.78);
+  border-radius:999px;
+  box-shadow:0 8px 28px rgba(15,23,42,.10),inset 0 1px 0 rgba(255,255,255,.92);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+}
+.a11y-btn{
+  background:transparent;
+  border:none;
+  color:#667085;
+  padding:6px 10px;
+  border-radius:999px;
+  cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.8125rem;
+  font-weight:700;
+  line-height:1;
+  min-height:32px;
+  transition:background .18s ease, color .18s ease;
+}
+.a11y-btn:hover,.a11y-btn:focus-visible{
+  background:rgba(255,255,255,.92);
+  border-color:rgba(255,255,255,.92);
+  color:#111827;
+  transform:translateY(-1px);
+  box-shadow:
+    0 14px 28px rgba(15,23,42,.08),
+    inset 0 1px 0 rgba(255,255,255,.92);
+}
+.a11y-btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:
+    0 8px 24px rgba(15,23,42,.03),
+    inset 0 1px 0 rgba(255,255,255,.72);
+}
+
+
+/* ===== 03C · High-contrast mode ===== */
+body.hc{
+  --bg:#0a0a0a;
+  --surface:#111214;
+  --dark:#f5f7fa;
+  --mid:#d0d5dd;
+  --border:#3a3f47;
+  --shadow:0 2px 16px rgba(255,255,255,0.06);
+  background:#0a0a0a !important;
+  color:var(--dark) !important;
+}
+body.hc .welcome-card,
+body.hc .matrix-cell,
+body.hc .msg-card,
+body.hc .m-item,
+body.hc .prompt-card,
+body.hc .how-box,
+body.hc .status-card,
+body.hc .dashboard-card,
+body.hc .metric-card,
+body.hc .mini-card,
+body.hc .manager-panel,
+body.hc .focus-card,
+body.hc .rec-item,
+body.hc .preview-frame,
+body.hc .preview-card,
+body.hc .preview-mini,
+body.hc .phase-section,
+body.hc .apple-phase-nav,
+body.hc .tabs-list,
+body.hc .modal-dialog,
+body.hc .reflection-composer-card,
+body.hc .reflection-timeline-wrap,
+body.hc .reflection-entry-card,
+body.hc .msg-card,
+body.hc .prompt-card,
+body.hc .matrix-cell{
+  background:var(--surface) !important;
+  color:var(--dark) !important;
+  border-color:var(--border) !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+body.hc .a11y-bar{
+  background:#0a0a0a !important;
+  border-bottom:1px solid rgba(255,255,255,.14) !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+}
+body.hc .a11y-bar span{color:var(--mid) !important}
+body.hc .a11y-btn{
+  background:#17191c !important;
+  border-color:var(--border) !important;
+  color:var(--dark) !important;
+  box-shadow:none !important;
+}
+body.hc .a11y-btn:hover,
+body.hc .a11y-btn:focus-visible{
+  background:#1f2328 !important;
+  border-color:#68707c !important;
+  color:#fff !important;
+}
+body.hc .a11y-btn:disabled{
+  opacity:.5;
+  background:#141618 !important;
+}
+
+body.hc .site-header,
+body.hc .hero-shell,
+body.hc .showcase-shell,
+body.hc main,
+body.hc footer{
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+body.hc .hero-kicker,
+body.hc .header-kicker,
+body.hc .preview-kicker,
+body.hc .metric-label,
+body.hc .status-title,
+body.hc .reflection-kicker,
+body.hc .phase-nav-kicker{
+  color:#b8c0cc !important;
+}
+
+body.hc .hero-title,
+body.hc .header-title{
+  background:none !important;
+  -webkit-background-clip:initial !important;
+  background-clip:initial !important;
+  color:var(--dark) !important;
+}
+
+body.hc .hero-sub,
+body.hc .header-sub,
+body.hc .showcase-copy,
+body.hc .metric-sub,
+body.hc .panel-intro,
+body.hc .cell-body,
+body.hc .msg-meta,
+body.hc .msg-text,
+body.hc .m-desc,
+body.hc .prompt-priv,
+body.hc .how-box p,
+body.hc .status-tip,
+body.hc .status-body,
+body.hc .step-copy,
+body.hc .signal-label,
+body.hc .signal-value,
+body.hc .prompt-q,
+body.hc .preview-card p,
+body.hc .preview-mini span,
+body.hc .phase-header-copy p,
+body.hc .phase-nav-status,
+body.hc .reflection-entry-body,
+body.hc .reflection-journal-header p,
+body.hc .reflection-timeline-note,
+body.hc .reflection-timestamp{
+  color:var(--mid) !important;
+}
+
+body.hc .header-chip,
+body.hc .chip-btn.secondary,
+body.hc .modal-secondary,
+body.hc .hero-badge,
+body.hc .landing-badge,
+body.hc .phase-chip,
+body.hc .phase-nav-status,
+body.hc .preview-tag,
+body.hc .tab-badge,
+body.hc .reflection-phase-summary,
+body.hc .reflection-count-badge,
+body.hc .reflection-phase-chip{
+  background:#17191c !important;
+  color:var(--dark) !important;
+  border-color:var(--border) !important;
+  box-shadow:none !important;
+}
+
+body.hc .chip-btn.primary,
+body.hc .modal-primary,
+body.hc .onboard-pill.active,
+body.hc .phase-nav-pill.active{
+  background:#f5f7fa !important;
+  color:#0a0a0a !important;
+  border-color:#f5f7fa !important;
+  box-shadow:none !important;
+}
+
+body.hc .tabs-list{
+  background:#111214 !important;
+}
+body.hc .nav-tab{
+  color:var(--mid) !important;
+}
+body.hc .nav-tab:hover{
+  background:#17191c !important;
+  color:var(--dark) !important;
+}
+body.hc .nav-tab.active{
+  background:#f5f7fa !important;
+  color:#0a0a0a !important;
+  box-shadow:none !important;
+}
+
+body.hc .phase-progress-line,
+body.hc .bar-track,
+body.hc .progress-strip{
+  background:#20242a !important;
+  border-color:#20242a !important;
+}
+body.hc .phase-progress-fill,
+body.hc .bar-fill,
+body.hc .progress-strip-fill{
+  background:#f5f7fa !important;
+  box-shadow:none !important;
+}
+
+body.hc .focus-dot,
+body.hc .reflection-phase-dot,
+body.hc .onboard-check-dot{
+  filter:brightness(1.15) saturate(.2);
+}
+body.hc .ph-hcell,
+body.hc .dim-lbl{
+  background:#17191c !important;
+  color:var(--dark) !important;
+  border-color:var(--border) !important;
+}
+body.hc .cell-tag{
+  background:#17191c !important;
+  color:var(--dark) !important;
+}
+
+body.hc input,
+body.hc textarea,
+body.hc select,
+body.hc .prompt-ta,
+body.hc .reflection-select,
+body.hc .reflection-entry-text{
+  background:#0f1113 !important;
+  color:var(--dark) !important;
+  border-color:var(--border) !important;
+}
+body.hc input::placeholder,
+body.hc textarea::placeholder{
+  color:#98a2b3 !important;
+}
+
+body.hc .modal-overlay{
+  background:rgba(0,0,0,.82) !important;
+}
+
+body.hc .preview-pills span{
+  background:#6b7280 !important;
+}
+body.hc .summary-apple{
+  background:var(--surface) !important;
+  color:var(--dark) !important;
+  border-color:var(--border) !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+}
+body.hc .summary-apple::before{
+  display:none !important;
+}
+body.hc .summary-apple-kicker{
+  color:#b8c0cc !important;
+}
+body.hc .summary-apple-line{
+  color:var(--dark) !important;
+}
+body.hc .summary-apple-line span,
+body.hc .summary-apple-note{
+  color:var(--mid) !important;
+}
+body.hc footer{
+  color:var(--mid) !important;
+}
+
+
+/* ===== 03D · Core layout: header, welcome card, tabs, cards ===== */
+header{background:transparent;border-bottom:none;padding:28px 32px 22px;animation:fadeD .5s ease both}
+@keyframes fadeD{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeU{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.welcome-greeting{font-family:'Lora',serif;font-size:clamp(20px,3vw,30px);font-weight:600;line-height:1.2}
+.welcome-greeting em{font-style:italic;color:var(--knowledge)}
+.welcome-sub{font-size:0.875rem;color:var(--mid);margin-top:6px;font-weight:300;max-width:500px}
+
+.prog-widget{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:110px}
+.prog-label{font-size:0.625rem;color:var(--mid);font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.prog-wrap{position:relative;width:68px;height:68px}
+.prog-wrap svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:5}
+.ring-fill{fill:none;stroke:var(--knowledge);stroke-width:5;stroke-linecap:round;stroke-dasharray:175;stroke-dashoffset:175;transition:stroke-dashoffset .9s ease,stroke .4s ease}
+.ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.9375rem;font-weight:700;color:var(--knowledge)}
+.progress-strip{width:110px;height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:3px}
+.progress-strip-fill{height:100%;width:0;background:var(--knowledge);transition:width .9s ease,background .4s ease}
+
+.onboarding-progress-card{display:flex;flex-direction:column;gap:12px}
+.onboard-progress-head{display:flex;flex-direction:column;gap:4px}
+.onboard-prog-widget{align-items:flex-start;min-width:0}
+.onboard-prog-widget .prog-wrap{margin:2px 0}
+.onboard-prog-widget .progress-strip{width:100%}
+
+.wcard-wrap{max-width:1100px;margin:22px auto;padding:0 24px;animation:fadeU .5s .1s ease both}
+.welcome-card{background:linear-gradient(135deg,#EEF7F2,#EBF3FA);border:1px solid var(--border);border-radius:var(--radius);padding:20px 26px;display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.welcome-main{display:flex;gap:14px;align-items:flex-start;flex:1 1 640px}
+.w-icon{font-size:1.625rem;flex-shrink:0;margin-top:2px}
+.welcome-card h2{font-family:'Lora',serif;font-size:1rem;margin-bottom:4px}
+.welcome-card p{font-size:0.8438rem;color:var(--mid);line-height:1.6}
+.phase-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.pbadge{padding:4px 14px;border-radius:20px;font-size:0.7188rem;font-weight:600}
+.pbadge.active{border:2px solid var(--phase1);background:white;color:var(--phase1)}
+.pbadge.up{background:rgba(0,0,0,.05);color:var(--mid);border:2px solid transparent}
+.status-card{background:rgba(255,255,255,.72);border:1px solid var(--border);border-radius:12px;padding:14px 16px;min-width:220px;flex:0 0 250px}
+.status-title{font-size:0.6875rem;text-transform:uppercase;letter-spacing:.8px;color:var(--mid);font-weight:700}
+.status-body{font-size:0.8125rem;margin-top:6px;line-height:1.5}
+.status-tip{margin-top:8px;font-size:0.75rem;color:var(--mid)}
+
+main{max-width:1100px;margin:0 auto;padding:0 24px 48px}
+.tabs-wrap{margin-bottom:18px;animation:fadeU .5s .15s ease both}
+.tabs-list{display:flex;gap:4px;flex-wrap:wrap;list-style:none;border-bottom:2px solid var(--border)}
+.nav-tab{background:none;border:none;padding:11px 18px;font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:500;color:var(--mid);cursor:pointer;border-radius:8px 8px 0 0;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .2s,background .2s,border-color .2s;white-space:nowrap}
+.nav-tab:hover{color:var(--dark);background:rgba(0,0,0,.03)}
+.nav-tab.active{color:var(--dark);border-bottom-color:var(--dark);font-weight:700}
+.tab-panel{display:none;animation:fadeU .3s ease both}
+.tab-panel.active{display:block}
+.panel-intro{font-size:0.875rem;color:var(--mid);margin:14px 0 18px;line-height:1.6;max-width:100%}
+
+.pal-banner{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:14px;
+  padding:10px 16px;
+  border-radius:999px;
+  background:var(--ui-card-bg);
+  border:var(--ui-card-border);
+  box-shadow:var(--ui-card-shadow);
+  backdrop-filter:blur(16px) saturate(140%);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);
+  font-size:0.8125rem;
+}
+.pal-banner-label{
+  font-weight:700;
+  color:var(--mid);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  font-size:0.6875rem;
+}
+.pal-banner-name{
+  font-weight:700;
+  color:var(--dark);
+}
+.pal-banner-sep{
+  color:var(--border);
+}
+.pal-banner-help{
+  color:var(--mid);
+}
+.pal-banner-link{
+  color:var(--tasks);
+  font-weight:600;
+  text-decoration:none;
+}
+.pal-banner-legend{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.pal-banner-legend .dim-dot{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:0.75rem;
+  color:var(--mid);
+}
+.reflection-journal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+}
+
+.dim-legend{display:flex;gap:18px;margin-bottom:18px;flex-wrap:wrap}
+.dim-dot{display:flex;align-items:center;gap:7px;font-size:0.8125rem;font-weight:500}
+.dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+
+.ph-headers{display:grid;grid-template-columns:120px 1fr 1fr 1fr;gap:8px;margin-bottom:5px}
+.ph-hcell{text-align:center;padding:11px 8px;border-radius:8px 8px 0 0;font-weight:700;font-size:0.8125rem;color:white}
+.ph-hcell small{display:block;font-weight:400;font-size:0.6875rem;margin-top:1px;opacity:.9}
+.ph1h{background:var(--phase1)}.ph2h{background:var(--phase2)}.ph3h{background:var(--phase3)}
+.matrix-grid{display:grid;grid-template-columns:120px 1fr 1fr 1fr;gap:8px}
+.dim-lbl{display:flex;align-items:center;gap:7px;font-weight:700;font-size:0.75rem;padding:10px 7px;border-radius:8px;color:white;line-height:1.3}
+.matrix-cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:border-color .18s,background .18s;position:relative}
+.matrix-cell:hover,.matrix-cell:focus-visible{transform:none;box-shadow:none}
+.matrix-cell.visited{background:rgba(0,0,0,.012)}
+.cell-tag{font-size:0.625rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:7px}
+.cell-title{font-weight:700;font-size:0.8438rem;margin-bottom:5px;line-height:1.3}
+.cell-body{font-size:0.75rem;color:var(--mid);line-height:1.5}
+.cell-expand{font-size:0.6875rem;margin-top:8px;font-weight:500;opacity:.55;display:flex;align-items:center;gap:3px}
+.cell-detail{display:none;margin-top:9px;padding-top:9px;border-top:1px solid var(--border);font-size:0.7188rem;color:var(--mid);line-height:1.6}
+.cell-detail.open{display:block;animation:fadeU .2s ease both}
+.cell-detail ul{padding-left:15px;line-height:2}
+.cell-addr{margin-top:7px;font-style:italic;font-size:0.6875rem;opacity:.8}
+
+.msg-list{display:flex;flex-direction:column;gap:11px}
+.msg-card{background:var(--ui-card-bg);border:var(--ui-card-border);border-left:4px solid;border-radius:var(--ui-radius-md);padding:18px 20px;display:flex;gap:13px;box-shadow:var(--ui-card-shadow);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);transition:box-shadow .18s}
+.msg-card:hover{box-shadow:var(--ui-card-shadow-hover)}
+.avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.875rem;color:white;flex-shrink:0}
+.msg-meta{font-size:0.75rem;color:var(--mid);margin-bottom:4px}
+.msg-meta strong{color:var(--dark);font-weight:700}
+.msg-text{font-size:0.8438rem;line-height:1.6}
+.msg-week{font-size:0.6875rem;color:var(--mid);margin-top:5px;opacity:.75}
+.how-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-top:18px}
+.how-box h3{font-size:0.8438rem;font-weight:700;margin-bottom:5px}
+.how-box p{font-size:0.8125rem;color:var(--mid);line-height:1.6}
+
+
+.milestone-story{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(220px,.72fr) minmax(0,1.28fr);
+  gap:26px;
+  align-items:start;
+  padding:6px 0 8px;
+}
+.milestone-intro{
+  position:sticky;
+  top:104px;
+  align-self:start;
+  padding:24px 22px;
+  border-radius:30px;
+  background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.44));
+  border:1px solid rgba(255,255,255,.78);
+  box-shadow:0 24px 60px rgba(15,23,42,.08),0 6px 20px rgba(15,23,42,.04),inset 0 1px 0 rgba(255,255,255,.94);
+  backdrop-filter:blur(18px) saturate(145%);
+  -webkit-backdrop-filter:blur(18px) saturate(145%);
+  overflow:hidden;
+}
+.milestone-intro::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.46),rgba(255,255,255,0) 44%),radial-gradient(circle at 82% 16%,rgba(91,141,184,.12),transparent 26%);
+  pointer-events:none;
+}
+.milestone-intro > *{position:relative;z-index:1}
+.milestone-kicker{
+  font-size:0.6875rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#98a2b3;
+  margin-bottom:10px;
+}
+.milestone-intro h3{
+  font-family:'Lora',serif;
+  font-size:1.75rem;
+  line-height:1.08;
+  letter-spacing:-.03em;
+  max-width:10ch;
+  margin-bottom:12px;
+}
+.milestone-intro p{
+  font-size:0.875rem;
+  line-height:1.7;
+  color:#667085;
+}
+.milestone-progress{
+  margin-top:18px;
+  display:grid;
+  gap:9px;
+}
+.milestone-progress-label{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  font-size:0.6875rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#98a2b3;
+}
+.milestone-progress-bar{
+  height:10px;
+  border-radius:999px;
+  background:rgba(148,163,184,.14);
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.7);
+  box-shadow:inset 0 1px 1px rgba(15,23,42,.05);
+}
+.milestone-progress-fill{
+  height:100%;
+  width:var(--milestone-progress,0%);
+  border-radius:inherit;
+  background:linear-gradient(90deg,rgba(91,141,184,.95),rgba(123,110,138,.9),rgba(74,140,111,.92));
+  box-shadow:0 8px 18px rgba(91,141,184,.2);
+  transition:width .24s ease;
+}
+.milestone-progress-note{
+  font-size:0.75rem;
+  color:#98a2b3;
+}
+.m-list{
+  --milestone-progress:0%;
+  --milestone-line-scale:0;
+  position:relative;
+  display:grid;
+  gap:24px;
+  padding:28vh 0 32vh;
+  isolation:isolate;
+}
+.m-list::before,
+.m-list::after{
+  content:'';
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  width:4px;
+  border-radius:999px;
+  pointer-events:none;
+}
+.m-list::before{
+  top:0;
+  bottom:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.78),rgba(255,255,255,.24) 18%,rgba(255,255,255,.58) 50%,rgba(255,255,255,.2) 84%,rgba(255,255,255,.68));
+  box-shadow:0 0 0 1px rgba(255,255,255,.74),0 0 30px rgba(148,163,184,.12),inset 0 0 14px rgba(255,255,255,.82);
+  opacity:.98;
+}
+.m-list::after{
+  top:0;
+  height:calc(var(--milestone-line-scale) * 100%);
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(173,206,255,.94) 34%,rgba(186,174,214,.9) 64%,rgba(164,225,191,.92));
+  box-shadow:0 0 28px rgba(148,197,255,.22),0 0 42px rgba(255,255,255,.22);
+  transition:height .18s linear;
+}
+.m-item{
+  position:relative;
+  z-index:1;
+  width:calc(50% - 58px);
+  padding:26px 24px 22px;
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+  border-radius:34px;
+  border:1px solid rgba(255,255,255,.76);
+  background:linear-gradient(180deg,rgba(255,255,255,.6) 0%,rgba(255,255,255,.34) 100%);
+  box-shadow:0 24px 56px rgba(15,23,42,.08),0 6px 18px rgba(15,23,42,.04),inset 0 1px 0 rgba(255,255,255,.92),inset 0 -1px 0 rgba(255,255,255,.24);
+  backdrop-filter:blur(18px) saturate(155%);
+  -webkit-backdrop-filter:blur(18px) saturate(155%);
+  overflow:hidden;
+  opacity:.38;
+  transform:translateY(34px) scale(.965);
+  transition:opacity .5s ease, transform .7s cubic-bezier(.22,1,.36,1), box-shadow .28s ease, border-color .28s ease, background .28s ease;
+}
+.m-item::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.46),rgba(255,255,255,0) 40%),radial-gradient(circle at 92% 12%,rgba(91,141,184,.12),transparent 28%),radial-gradient(circle at 10% 100%,rgba(255,255,255,.18),transparent 26%);
+  pointer-events:none;
+}
+.m-item::after{
+  content:'';
+  position:absolute;
+  top:40px;
+  width:18px;
+  height:18px;
+  border-radius:999px;
+  background:rgba(255,255,255,.95);
+  border:1px solid rgba(255,255,255,.98);
+  box-shadow:0 0 0 7px rgba(255,255,255,.18),0 10px 24px rgba(15,23,42,.10),inset 0 1px 0 rgba(255,255,255,.98);
+}
+.m-item:nth-child(odd){align-self:flex-start;margin-right:auto}
+.m-item:nth-child(odd)::after{right:-67px}
+.m-item:nth-child(even){align-self:flex-end;margin-left:auto}
+.m-item:nth-child(even)::after{left:-67px}
+.m-item.is-visible{
+  opacity:.7;
+  transform:translateY(0) scale(.985);
+}
+.m-item.is-active{
+  opacity:1;
+  transform:translateY(0) scale(1);
+  border-color:rgba(255,255,255,.92);
+  background:linear-gradient(180deg,rgba(255,255,255,.76) 0%,rgba(255,255,255,.48) 100%);
+  box-shadow:0 34px 72px rgba(15,23,42,.11),0 12px 28px rgba(15,23,42,.06),inset 0 1px 0 rgba(255,255,255,.96),inset 0 -1px 0 rgba(255,255,255,.28);
+}
+.m-item > div:last-child{position:relative;z-index:1;flex:1 1 auto}
+.m-step{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:10px;
+  padding:6px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.56);
+  border:1px solid rgba(255,255,255,.76);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.76);
+  font-size:0.6875rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#667085;
+}
+.m-step .dot{
+  width:8px;
+  height:8px;
+  box-shadow:0 0 0 6px rgba(255,255,255,.26);
+}
+.m-quote{
+  font-family:'Lora',serif;
+  font-size:1.125rem;
+  line-height:1.42;
+  color:#111827;
+  margin:2px 0 10px;
+  letter-spacing:-.01em;
+}
+.m-desc{font-size:0.8125rem;color:var(--mid);line-height:1.68}
+.m-trigger{
+  margin-top:14px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 11px;
+  border-radius:999px;
+  font-size:0.6875rem;
+  color:#667085;
+  background:rgba(255,255,255,.44);
+  border:1px solid rgba(255,255,255,.72);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.72);
+}
+@media(max-width:920px){
+  .milestone-story{
+    grid-template-columns:1fr;
+    gap:18px;
+  }
+  .milestone-intro{
+    position:relative;
+    top:auto;
+  }
+  .m-list{
+    padding:10px 0 16px 38px;
+    gap:18px;
+  }
+  .m-list::before,
+  .m-list::after{
+    left:14px;
+    transform:none;
+    width:4px;
+  }
+  .m-item{
+    width:100%;
+    align-self:stretch !important;
+    margin:0 !important;
+  }
+  .m-item::after{
+    left:-34px !important;
+    right:auto !important;
+    top:38px;
+  }
+}
+body.hc .milestone-intro{
+  background:var(--surface) !important;
+  border-color:var(--border) !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+body.hc .milestone-intro::before{display:none !important}
+body.hc .m-list::before{background:#4b5563 !important;box-shadow:none !important}
+body.hc .m-list::after{background:#f5f7fa !important;box-shadow:none !important}
+body.hc .m-item{
+  background:var(--surface) !important;
+  border-color:var(--border) !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  opacity:1 !important;
+  transform:none !important;
+}
+body.hc .m-item::before{display:none !important}
+body.hc .m-item::after,
+body.hc .m-step,
+body.hc .m-trigger{
+  background:var(--surface) !important;
+  border-color:var(--dark) !important;
+  box-shadow:none !important;
+}
+/* Linear-like milestone icons */
+.m-icon-wrap{
+  width:44px;
+  height:44px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  border:1px solid rgba(16,24,40,.06);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+}
+
+.m-icon-wrap svg{
+  width:18px;
+  height:18px;
+  stroke-width:1.9;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  opacity:.9;
+}
+
+.m-item:hover .m-icon-wrap svg{
+  opacity:1;
+}
+
+.prompts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:13px}
+.prompt-card{background:var(--ui-card-bg);border:var(--ui-card-border);border-radius:var(--ui-radius-lg);padding:20px;box-shadow:var(--ui-card-shadow);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);transition:box-shadow .18s}
+.prompt-card:hover{box-shadow:var(--ui-card-shadow-hover);transform:none}
+.prompt-week{font-size:0.6562rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:9px}
+.prompt-q{font-family:'Lora',serif;font-size:0.9062rem;line-height:1.5;font-style:italic;margin-bottom:11px}
+.prompt-ta{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-family:'DM Sans',sans-serif;font-size:0.8125rem;color:var(--dark);background:var(--bg);resize:vertical;min-height:84px;transition:border-color .2s,box-shadow .2s;line-height:1.5}
+.prompt-ta:focus{outline:none;border-color:var(--tasks);box-shadow:0 0 0 3px rgba(91,141,184,.12)}
+.prompt-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:7px}
+.prompt-priv{font-size:0.6875rem;color:var(--mid);display:flex;align-items:center;gap:4px;opacity:.8}
+.prompt-save{font-size:0.6875rem;color:var(--success);opacity:0;transition:opacity .25s}
+.prompt-save.show{opacity:1}
+
+.reflection-journal-shell{
+  display:grid;
+  grid-template-columns:minmax(300px, .95fr) minmax(0, 1.05fr);
+  gap:18px;
+  align-items:start;
+}
+.reflection-journal-header{
+  grid-column:1 / -1;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:16px;
+  margin-bottom:2px;
+}
+.reflection-kicker{
+  font-size:0.6875rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#98a2b3;
+  margin-bottom:6px;
+}
+.reflection-journal-header h3,
+.reflection-timeline-head h4,
+.reflection-composer-top h4{
+  font-size:1.25rem;
+  font-weight:700;
+  line-height:1.2;
+}
+.reflection-journal-header p{
+  font-size:0.875rem;
+  color:var(--mid);
+  max-width:62ch;
+  line-height:1.6;
+}
+.reflection-phase-summary,
+.reflection-count-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:34px;
+  padding:0 12px;
+  border-radius:999px;
+  background:#f8fafc;
+  border:1px solid var(--border);
+  color:var(--mid);
+  font-size:0.75rem;
+  font-weight:700;
+  white-space:nowrap;
+}
+.reflection-composer-card,
+.reflection-timeline-wrap{
+  position:relative;
+  background:var(--ui-card-bg);
+  border:var(--ui-card-border);
+  border-radius:var(--ui-radius-xl);
+  padding:22px;
+  box-shadow:var(--ui-card-shadow);
+  backdrop-filter:blur(16px) saturate(140%);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);
+}
+.reflection-composer-top,
+.reflection-timeline-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+.reflection-timeline-note{
+  font-size:0.75rem;
+  color:var(--mid);
+  white-space:nowrap;
+}
+.reflection-label{
+  display:block;
+  margin:0 0 8px;
+  font-size:0.75rem;
+  font-weight:700;
+  color:var(--dark);
+}
+.reflection-controls{margin-bottom:14px;}
+.reflection-select,
+.reflection-entry-text{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:#fbfcfd;
+  color:var(--dark);
+  font:inherit;
+}
+.reflection-select{
+  height:44px;
+  padding:0 14px;
+}
+.reflection-entry-text{
+  min-height:180px;
+  padding:14px;
+  resize:vertical;
+  line-height:1.65;
+}
+.reflection-select:focus,
+.reflection-entry-text:focus{
+  outline:none;
+  border-color:var(--tasks);
+  box-shadow:0 0 0 3px rgba(91,141,184,.12);
+}
+.reflection-composer-actions{
+  margin-top:14px;
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.reflection-empty{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:180px;
+  border:1px dashed var(--border);
+  border-radius:16px;
+  background:#fbfcfe;
+  color:var(--mid);
+  text-align:center;
+  padding:18px;
+  line-height:1.6;
+}
+.reflection-empty.hidden{
+  display:none;
+}
+.reflection-timeline{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.reflection-timeline-item{
+  position:relative;
+  display:grid;
+  grid-template-columns:92px 1fr;
+  gap:14px;
+  align-items:start;
+}
+.reflection-timeline-item::before{
+  content:'';
+  position:absolute;
+  left:40px;
+  top:42px;
+  bottom:-18px;
+  width:1px;
+  background:var(--border);
+}
+.reflection-timeline-item:last-child::before{
+  display:none;
+}
+.reflection-timeline-phase{
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+}
+.reflection-phase-dot{
+  width:18px;
+  height:18px;
+  border-radius:999px;
+  border:4px solid #fff;
+  box-shadow:0 0 0 1px rgba(16,24,40,.06);
+}
+.reflection-phase-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:0.6875rem;
+  font-weight:700;
+  background:#f8fafc;
+  border:1px solid var(--border);
+  color:var(--mid);
+}
+.reflection-timestamp{
+  font-size:0.6875rem;
+  color:var(--mid);
+  text-align:center;
+  line-height:1.4;
+}
+.reflection-entry-card{
+  background:rgba(255,255,255,.72);
+  border:var(--ui-card-border);
+  border-radius:var(--ui-radius-md);
+  padding:16px 18px;
+  box-shadow:0 2px 8px rgba(15,23,42,.04), inset 0 1px 0 rgba(255,255,255,.88);
+}
+.reflection-delete-btn{
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:var(--mid);
+  font-size:1.1rem;
+  line-height:1;
+  padding:2px 6px;
+  border-radius:6px;
+  opacity:.45;
+  transition:opacity .15s, background .15s, color .15s;
+  flex-shrink:0;
+}
+.reflection-delete-btn:hover{
+  opacity:1;
+  background:rgba(192,105,90,.08);
+  color:var(--confidence);
+}
+.reflection-entry-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+}
+.reflection-entry-title{
+  font-size:0.875rem;
+  font-weight:700;
+}
+.reflection-entry-body{
+  font-size:0.875rem;
+  color:var(--mid);
+  line-height:1.7;
+  white-space:pre-wrap;
+}
+@media(max-width:900px){
+  .reflection-journal-shell{
+    grid-template-columns:1fr;
+  }
+}
+@media(max-width:640px){
+  .reflection-journal-header,
+  .reflection-composer-top,
+  .reflection-timeline-head{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .reflection-timeline-item{
+    grid-template-columns:1fr;
+  }
+  .reflection-timeline-item::before{
+    display:none;
+  }
+  .reflection-timeline-phase{
+    align-items:flex-start;
+    flex-direction:row;
+  }
+  .reflection-timestamp{
+    text-align:left;
+  }
+}
+
+.toast{position:fixed;right:20px;bottom:20px;background:var(--dark);color:white;padding:10px 14px;border-radius:10px;font-size:0.75rem;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .2s,transform .2s;z-index:9998}
+.toast.show{opacity:1;transform:translateY(0)}
+
+footer{text-align:center;padding:24px;font-size:0.75rem;color:var(--mid);border-top:1px solid var(--border);background:var(--surface);line-height:1.8}
+
+
+.header-actions{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+.header-chip{border:1px solid rgba(30,30,30,.10);background:#F7F5F0;color:var(--dark);border-radius:999px;padding:9px 14px;font-family:"DM Sans",sans-serif;font-size:0.75rem;font-weight:700;cursor:pointer;transition:transform .18s,box-shadow .18s,background .18s,border-color .18s}
+.header-chip:hover,.header-chip:focus-visible{transform:translateY(-1px);box-shadow:0 6px 16px rgba(16,24,40,.08);background:#fff}
+.modal-overlay{position:fixed;inset:0;background:rgba(17,24,39,.42);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .24s ease,visibility .24s ease;z-index:9997}
+.modal-overlay.open{opacity:1;visibility:visible;pointer-events:auto}
+.modal-dialog{width:min(920px,100%);max-height:min(88vh,900px);overflow:auto;background:linear-gradient(180deg,#fff,#fbfaf7);border:1px solid rgba(30,30,30,.09);border-radius:22px;box-shadow:0 30px 80px rgba(16,24,40,.18);padding:20px}
+.modal-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.modal-kicker{font-size:0.6875rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--mid)}
+.modal-close{width:36px;height:36px;border-radius:999px;border:1px solid rgba(30,30,30,.08);background:#fff;color:var(--dark);font-size:1.5rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s,border-color .18s,transform .18s}
+.modal-close:hover,.modal-close:focus-visible{background:#f6f5f2;transform:translateY(-1px)}
+.modal-body{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr);gap:18px;align-items:start}
+.modal-summary{min-width:0;flex:auto;background:rgba(250,250,248,.95)}
+.modal-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.modal-primary,.modal-secondary{border-radius:999px;padding:10px 16px;font-family:"DM Sans",sans-serif;font-size:0.75rem;font-weight:700;cursor:pointer;transition:transform .18s,box-shadow .18s,background .18s,border-color .18s}
+.modal-primary{background:var(--dark);color:#fff;border:1px solid var(--dark)}
+.modal-secondary{background:#fff;color:var(--dark);border:1px solid rgba(30,30,30,.10)}
+.modal-primary:hover,.modal-secondary:hover,.modal-primary:focus-visible,.modal-secondary:focus-visible{transform:translateY(-1px);box-shadow:0 6px 16px rgba(16,24,40,.08)}
+body.modal-open{overflow:hidden}
+body.hc .modal-dialog,body.hc .modal-close,body.hc .header-chip,body.hc .modal-secondary{background:var(--surface);border-color:#666;color:var(--dark)}
+body.hc .modal-overlay{background:rgba(0,0,0,.72)}
+@media(max-width:760px){.modal-overlay{padding:14px}.modal-dialog{padding:16px;border-radius:18px}.modal-body{grid-template-columns:1fr}.modal-actions{flex-direction:column}.modal-primary,.modal-secondary{width:100%}}
+
+@media(max-width:760px){
+  .welcome-card{padding:18px}
+  .status-card{flex:1 1 100%}
+}
+
+
+
+/* ===== 03E · Portfolio / storytelling layer ===== */
+/* PORTFOLIO LAYER */
+.showcase-shell{
+  max-width:1100px;
+  margin:0 auto;
+  padding:0 24px 24px;
+  display:grid;
+  gap:16px;
+  animation:fadeU .55s .16s ease both
+}
+.hero-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.55fr) minmax(320px,.95fr);
+  gap:16px;
+  margin:0
+}
+.showcase-card{
+  background:rgba(255,255,255,.88);
+  border:1px solid rgba(30,30,30,.08);
+  border-radius:14px;
+  box-shadow:0 1px 2px rgba(16,24,40,.04), 0 10px 24px rgba(16,24,40,.03);
+  padding:20px;
+  position:relative;
+  overflow:hidden;
+  height:100%;
+  backdrop-filter:blur(6px)
+}
+.showcase-card::after{content:none}
+.showcase-eyebrow{
+  font-size:0.6875rem;
+  font-weight:700;
+  letter-spacing:.9px;
+  text-transform:uppercase;
+  color:var(--mid);
+  margin-bottom:10px
+}
+.showcase-title{font-family:'Lora',serif;font-size:1.5rem;line-height:1.2;margin-bottom:10px;max-width:15ch}
+.showcase-copy{font-size:0.875rem;color:var(--mid);max-width:58ch}
+.showcase-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.chip-btn{
+  border:1px solid rgba(30,30,30,.08);
+  border-radius:999px;
+  padding:9px 14px;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.75rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform .18s,box-shadow .18s,background .18s,border-color .18s
+}
+.chip-btn.primary{background:var(--dark);color:white;border-color:var(--dark)}
+.chip-btn.secondary{background:#F6F5F2;color:var(--dark)}
+.chip-btn:hover,.chip-btn:focus-visible{transform:translateY(-1px);box-shadow:0 6px 16px rgba(16,24,40,.08)}
+.metrics-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:16px;
+  margin:0
+}
+.metric-card{
+  background:rgba(255,255,255,.9);
+  border:1px solid rgba(30,30,30,.08);
+  border-radius:14px;
+  padding:18px;
+  min-height:176px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  box-shadow:0 1px 2px rgba(16,24,40,.04);
+  transition:transform .2s,box-shadow .2s,border-color .2s
+}
+.metric-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(16,24,40,.06);border-color:rgba(30,30,30,.12)}
+.metric-label{font-size:0.6875rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--mid);margin-bottom:10px}
+.metric-value{font-family:'Lora',serif;font-size:1.75rem;line-height:1;color:var(--dark)}
+.metric-sub{font-size:0.75rem;color:var(--mid);margin-top:14px;line-height:1.55}
+.storyline-card{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:18px;
+  align-items:stretch;
+  margin:0
+}
+.storyline-card .showcase-card{
+  width:100%;
+}
+
+.summary-strip{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:0;
+  margin-top:2px;
+}
+.summary-apple{
+  position:relative;
+  overflow:hidden;
+  padding:22px 26px;
+  border-radius:28px;
+  background:linear-gradient(180deg, rgba(255,255,255,.82), rgba(248,250,252,.72));
+  border:1px solid rgba(255,255,255,.82);
+  box-shadow:
+    0 16px 38px rgba(15,23,42,.05),
+    0 4px 12px rgba(15,23,42,.03),
+    inset 0 1px 0 rgba(255,255,255,.92);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.summary-apple::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.42), rgba(255,255,255,0) 42%),
+    radial-gradient(circle at 88% 16%, rgba(91,141,184,.08), transparent 22%);
+  pointer-events:none;
+}
+.summary-apple > *{
+  position:relative;
+  z-index:1;
+}
+.summary-apple-kicker{
+  font-size:0.6562rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#98a2b3;
+  margin-bottom:12px;
+}
+.summary-apple-lines{
+  display:grid;
+  gap:6px;
+  margin-bottom:10px;
+}
+.summary-apple-line{
+  color:#98a2b3; /* de-emphasize base text */
+  font-family:'Lora',serif;
+  font-size:clamp(calc(24px * var(--font-scale)), calc(2vw * var(--font-scale)), calc(32px * var(--font-scale)));
+  line-height:1.12;
+  letter-spacing:-.03em;
+}
+.summary-apple-line span{
+  background:linear-gradient(180deg,#111827 0%, #444444 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.summary-apple-note{
+  font-size:0.875rem;
+  line-height:1.65;
+  color:#667085;
+  max-width:60ch;
+}
+.journey-line{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.journey-step{
+  background:#FAFAF8;
+  border:1px solid rgba(30,30,30,.08);
+  border-radius:14px;
+  padding:16px;
+  position:relative;
+  min-height:180px;
+  transition:transform .18s, box-shadow .18s,border-color .18s
+}
+.journey-step:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(16,24,40,.05);border-color:rgba(30,30,30,.12)}
+.step-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:0.6875rem;font-weight:700;margin-bottom:12px}
+.step-title{font-weight:700;font-size:0.875rem;margin-bottom:8px}
+.step-copy{font-size:0.7812rem;color:var(--mid);line-height:1.6}
+.mini-panel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;height:100%}
+.mini-card{
+  border:1px solid rgba(30,30,30,.08);
+  border-radius:14px;
+  padding:16px;
+  background:#FAFAF8;
+  height:100%
+}
+.mini-card h3{font-size:0.8125rem;margin-bottom:8px}
+.signal-list{
+  display:grid;
+  gap:0;
+  margin-top:4px
+}
+.signal-item{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:16px;
+  font-size:0.8125rem;
+  padding:16px 0;
+  border-bottom:1px solid rgba(30,30,30,.08)
+}
+.signal-item:first-child{padding-top:6px}
+.signal-item:last-child{border-bottom:none;padding-bottom:0}
+.signal-label{color:var(--mid)}
+.signal-value{font-weight:700;text-align:right}
+.tab-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:24px;
+  height:24px;
+  padding:0 8px;
+  border-radius:999px;
+  margin-left:2px;
+  background:#f3f4f6;
+  color:#667085;
+  font-size:0.625rem;
+  font-weight:700;
+  letter-spacing:.02em;
+}
+
+.nav-tab.active .tab-badge{
+  background:#eef2ff;
+  color:#4338ca;
+}
+
+.nav-tab svg{
+    width:14px;
+    height:14px;
+  }
+}
+
+
+
+.manager-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:0;align-items:start}
+.manager-hero,
+.manager-panel,
+.focus-card,
+.dashboard-card{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.76));
+  border:1px solid rgba(255,255,255,.82);
+  border-radius:28px;
+  box-shadow:0 18px 40px rgba(15,23,42,.06),0 4px 12px rgba(15,23,42,.03),inset 0 1px 0 rgba(255,255,255,.94);
+  backdrop-filter:blur(16px) saturate(140%);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);
+}
+.manager-hero::before,
+.manager-panel::before,
+.focus-card::before,
+.dashboard-card::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.42),rgba(255,255,255,0) 46%),radial-gradient(circle at 88% 14%,rgba(91,141,184,.10),transparent 22%);
+  pointer-events:none;
+}
+.manager-hero > *,
+.manager-panel > *,
+.focus-card > *,
+.dashboard-card > *{position:relative;z-index:1}
+.manager-top-row{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(320px,.9fr);gap:20px;align-items:stretch;position:relative;z-index:2}
+.manager-top-row .manager-hero,
+.manager-top-row .dashboard-card{
+  box-shadow:0 14px 30px rgba(15,23,42,.05),0 3px 10px rgba(15,23,42,.025),inset 0 1px 0 rgba(255,255,255,.96);
+}
+.manager-hero{padding:28px 28px 24px;min-height:100%}
+.manager-kicker,.dashboard-card h3,.manager-panel h3,.focus-card h3{font-size:0.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#98a2b3}
+.manager-panel{display:flex;flex-direction:column;gap:16px}
+.manager-panel h3{margin-bottom:6px}
+.manager-hero-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:22px}
+.manager-hero-title{font-family:'Lora',serif;font-size:clamp(30px,3.2vw,44px);line-height:1.02;letter-spacing:-.04em;color:#111827;max-width:11ch;margin-top:8px}
+.manager-hero-copy{font-size:0.875rem;line-height:1.7;color:#667085;max-width:62ch;margin-top:12px}
+.manager-status-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.84);box-shadow:inset 0 1px 0 rgba(255,255,255,.88);white-space:nowrap;font-size:0.75rem;font-weight:700;color:#334155}
+.manager-status-pill .dot{width:8px;height:8px}
+.focus-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.focus-item{display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:20px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.72);box-shadow:inset 0 1px 0 rgba(255,255,255,.76);min-height:132px}
+.focus-dot{width:10px;height:10px;border-radius:50%;margin-top:6px;flex-shrink:0;box-shadow:0 0 0 6px rgba(255,255,255,.38)}
+.focus-item strong{display:block;font-size:0.9375rem;line-height:1.35;color:#111827;margin-bottom:6px}
+.focus-item div div{font-size:0.8125rem;line-height:1.65;color:#667085}
+.manager-stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;height:100%}
+.dashboard-card{padding:22px;min-height:188px;display:flex;flex-direction:column;justify-content:space-between}
+.dashboard-num{font-family:'Lora',serif;font-size:2.625rem;line-height:1;letter-spacing:-.05em;color:#111827}
+.dashboard-note,.manager-panel p,.focus-card p{font-size:0.8125rem;color:#667085;line-height:1.65}
+.dashboard-note{margin-top:18px;max-width:26ch}
+.manager-bottom-row{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(300px,.92fr);gap:20px;align-items:start;margin-top:30px;position:relative;z-index:1}
+.manager-bottom-row .manager-panel,
+.manager-bottom-row .focus-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(244,247,251,.82));
+  border-color:rgba(255,255,255,.88);
+  box-shadow:0 24px 52px rgba(15,23,42,.08),0 8px 20px rgba(15,23,42,.04),inset 0 1px 0 rgba(255,255,255,.98);
+}
+.manager-panel,.focus-card{padding:20px 22px}
+.manager-panel p,.focus-card p{margin:0 0 12px}
+.bar-stack{display:flex;flex-direction:column;gap:12px}
+.bar-row{display:grid;grid-template-columns:108px 1fr 48px;gap:12px;align-items:center}
+.bar-label{font-size:0.75rem;font-weight:700;color:#111827}
+.bar-track{height:12px;background:rgba(148,163,184,.12);border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.72);box-shadow:inset 0 1px 1px rgba(15,23,42,.05)}
+.bar-fill{height:100%;border-radius:999px;transition:width .6s ease;box-shadow:0 8px 18px rgba(15,23,42,.10)}
+.rec-list{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+.rec-item{padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.72);box-shadow:inset 0 1px 0 rgba(255,255,255,.76);min-height:0;display:flex;flex-direction:column;justify-content:center}
+.rec-item strong{display:block;font-size:0.8438rem;margin-bottom:4px;color:#111827}
+.rec-item span{font-size:0.7812rem;color:#667085;line-height:1.5}
+.focus-card{min-height:100%}
+body.hc .manager-hero,body.hc .dashboard-card,body.hc .manager-panel,body.hc .focus-card,body.hc .rec-item,body.hc .focus-item{background:var(--surface)!important;border-color:var(--border)!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+body.hc .manager-hero::before,body.hc .dashboard-card::before,body.hc .manager-panel::before,body.hc .focus-card::before{display:none!important}
+body.hc .manager-status-pill{background:#17191c!important;border-color:var(--border)!important;color:var(--dark)!important;box-shadow:none!important}
+body.hc .bar-track{background:#20242a!important;border-color:#20242a!important;box-shadow:none!important}
+@media(max-width:1080px){
+  .manager-top-row,.manager-bottom-row{grid-template-columns:1fr}
+}
+@media(max-width:900px){
+  .focus-list,.manager-stats-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:680px){
+  .manager-hero,.manager-panel,.focus-card,.dashboard-card{padding:18px;border-radius:22px}
+  .manager-bottom-row{margin-top:22px}
+  .focus-list,.manager-stats-grid{grid-template-columns:1fr}
+  .focus-item{min-height:auto}
+  .dashboard-card{min-height:auto}
+  .dashboard-num{font-size:2.25rem}
+  .bar-row{grid-template-columns:88px 1fr 40px;gap:10px}
+  .manager-hero-head{flex-direction:column;align-items:flex-start}
+}
+.fade-in-up{opacity:0;transform:translateY(20px);transition:opacity .55s ease, transform .55s ease}
+.fade-in-up.visible{opacity:1;transform:translateY(0)}
+body.hc .showcase-card,body.hc .metric-card,body.hc .journey-step,body.hc .mini-card,body.hc .dashboard-card,body.hc .manager-panel,body.hc .focus-card,body.hc .rec-item{background:var(--surface);border-color:#666}
+body.hc .chip-btn.secondary{background:#222;color:#fff}
+
+@media(max-width:900px){
+  .hero-grid,.storyline-card,.manager-layout{grid-template-columns:1fr}
+  .metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+@media(max-width:680px){
+  .a11y-bar{
+    padding:10px 14px;
+    gap:8px;
+    justify-content:flex-start;
+  }
+  .a11y-btn{
+    min-height:38px;
+    padding:7px 12px;
+    border-radius:12px;
+    font-size:0.75rem;
+  }
+
+  .metrics-grid,.dashboard-grid,.mini-panel,.journey-line{grid-template-columns:1fr}
+  .showcase-shell{padding:0 10px 18px;gap:12px}
+
+  .ph-headers,.matrix-grid{grid-template-columns:80px 1fr 1fr 1fr}
+  .dim-lbl{font-size:0.625rem;padding:6px 4px}
+  .matrix-cell{padding:9px}
+  header{padding:18px 14px}
+  main{padding:0 10px 36px}
+  .a11y-bar{padding:7px 14px}
+    .tabs-wrap{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:4px;
+    scrollbar-width:none;
+  }
+
+  .tabs-wrap::-webkit-scrollbar{
+    display:none;
+  }
+
+  .tabs-list{
+    width:max-content;
+    min-width:100%;
+    flex-wrap:nowrap;
+    justify-content:flex-start;
+    gap:8px;
+    padding:8px;
+  }
+
+  .nav-tab{
+    flex:0 0 auto;
+    justify-content:flex-start;
+    padding:10px 14px;
+    font-size:0.8125rem;
+  }
+
+  .tab-badge{
+    min-width:22px;
+    height:22px;
+    padding:0 7px;
+    font-size:0.625rem;
+  }
+}
+
+
+/* ===== 03F · Theme polish: Linear + Notion hybrid ===== */
+/* ===== Version A: Linear + Notion hybrid theme ===== */
+:root{
+  --bg:#f6f7f9;
+  --surface:#ffffff;
+  --dark:#171717;
+  --mid:#667085;
+  --border:#e7eaf0;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 10px 24px rgba(16,24,40,.04);
+  --font-scale:1;
+  --base-font-size:calc(16px * var(--font-scale));
+}
+body{
+  background:
+    radial-gradient(circle at 18% -6%, rgba(255,255,255,.92), transparent 34%),
+    radial-gradient(circle at 82% 10%, rgba(91,141,184,.08), transparent 30%),
+    radial-gradient(circle at 70% 88%, rgba(74,140,111,.05), transparent 28%),
+    linear-gradient(180deg, #fbfbfd 0%, #f4f5f8 46%, #f6f7f9 100%);
+  color:var(--dark);
+}
+.showcase-card,.status-card,.matrix-cell,.msg-card,.m-item,.prompt-card,.how-box,.dashboard-card,.metric-card,.mini-card,.storyline-card aside{
+  box-shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.04) !important;
+  border:1px solid var(--border) !important;
+}
+.site-header{
+  position:relative;
+  padding:40px 24px 24px;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  backdrop-filter:none;
+}
+/* ===== Tabs: final responsive version ===== */
+.tabs-wrap{
+  display:block;
+  width:100%;
+  margin-bottom:22px;
+  padding-bottom:2px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.tabs-wrap::-webkit-scrollbar{display:none}
+
+.tabs-list{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:10px;
+  flex-wrap:nowrap;
+  list-style:none;
+  width:max-content;
+  min-width:100%;
+  max-width:100%;
+  padding:10px;
+  margin:0;
+  background:rgba(255,255,255,.72);
+  border:1px solid var(--border);
+  border-radius:18px;
+  box-shadow:0 1px 2px rgba(16,24,40,.04);
+}
+
+.nav-tab{
+  appearance:none;
+  border:none !important;
+  background:transparent;
+  margin:0;
+  padding:10px 16px;
+  border-radius:12px;
+
+  font-family:'DM Sans',sans-serif;
+  font-size:0.875rem;
+  font-weight:600;
+  color:var(--mid);
+
+  cursor:pointer;
+  white-space:nowrap;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  flex:0 0 auto;
+
+  transition:
+    background .2s ease,
+    color .2s ease,
+    box-shadow .2s ease,
+    transform .2s ease;
+}
+
+.nav-tab:hover{
+  background:#f6f8fb;
+  color:var(--dark);
+}
+
+.nav-tab:focus-visible{
+  outline:none;
+  box-shadow:0 0 0 3px rgba(67,56,202,.12);
+}
+
+.nav-tab.active{
+  background:#ffffff;
+  color:#4338ca;
+  font-weight:700;
+  box-shadow:
+    0 1px 2px rgba(16,24,40,.05),
+    0 0 0 1px rgba(67,56,202,.08);
+}
+
+.nav-tab.active:hover{
+  background:#ffffff;
+  color:#4338ca;
+}
+.showcase-shell,.tabs-wrap,main{max-width:1160px}
+.showcase-shell{gap:20px;padding-bottom:28px}
+.hero-grid,.storyline-card,.metrics-grid{gap:20px}
+.showcase-card,.metric-card,.mini-card,.status-card,.matrix-cell,.msg-card,.m-item,.prompt-card,.how-box,.dashboard-card{border-radius:16px !important}
+.showcase-card,.metric-card,.prompt-card,.how-box,.dashboard-card{padding:20px !important}
+.metric-card{min-height:150px; display:flex; flex-direction:column; justify-content:space-between}
+.metric-value{font-size:2.25rem !important; letter-spacing:-1px}
+.metric-label,.showcase-eyebrow,.status-title{color:#98a2b3 !important}
+.showcase-title{font-size:1.75rem; max-width:17ch}
+.showcase-copy,.metric-sub,.panel-intro,.cell-body,.msg-meta,.msg-text,.m-desc,.prompt-priv,.how-box p,.status-tip,.status-body,.step-copy,.signal-label,.signal-value,.prompt-q{color:var(--mid) !important}
+.matrix-grid,.ph-headers{gap:14px}
+.ph-hcell{
+  border-radius:12px;
+  color:var(--dark);
+  background:#f8fafc !important;
+  border:1px solid var(--border);
+}
+.dim-lbl{
+  border-radius:12px;
+  background:#111827 !important;
+}
+.matrix-cell{
+  padding:18px 18px 16px !important;
+  background:var(--ui-card-bg) !important;
+  border:var(--ui-card-border) !important;
+  border-top-width:2px !important;
+  border-top-color:var(--accent, var(--border)) !important;
+  border-radius:var(--ui-radius-lg) !important;
+  box-shadow:var(--ui-card-shadow) !important;
+  backdrop-filter:blur(16px) saturate(140%);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);
+  transition:border-color .18s ease, box-shadow .18s ease, background .18s ease !important;
+}
+.matrix-cell:hover,.matrix-cell:focus-visible{
+  transform:none;
+  box-shadow:var(--ui-card-shadow-hover) !important;
+  border-color:var(--accent, var(--border)) !important;
+  background:var(--ui-card-bg) !important;
+}
+.matrix-cell::before{
+  display:none;
+}
+.matrix-cell[data-dimension="knowledge"]{--accent:var(--knowledge)}
+.matrix-cell[data-dimension="tasks"]{--accent:var(--tasks)}
+.matrix-cell[data-dimension="confidence"]{--accent:var(--confidence)}
+.matrix-cell[data-dimension="connection"]{--accent:var(--connection)}
+.cell-tag{
+  background:#f8fafc !important;
+  color:var(--dark) !important;
+  font-weight:600;
+  letter-spacing:.5px;
+}
+.cell-title,.m-title,.showcase-title,h2,h3,.welcome-greeting{font-weight:600 !important}
+.prompt-q{font-family:'DM Sans',sans-serif !important; font-style:normal !important; font-size:0.9375rem}
+.prompt-ta{
+  background:#fbfcfd;
+  min-height:110px;
+}
+.header-chip,.chip-btn.secondary,.modal-secondary{
+  background:rgba(255,255,255,.72) !important;
+  border:1px solid rgba(255,255,255,.78) !important;
+  box-shadow:0 8px 24px rgba(15,23,42,.05), inset 0 1px 0 rgba(255,255,255,.88);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.chip-btn.primary,.modal-primary{
+  background:#111827 !important;
+  border-color:#111827 !important;
+}
+footer{
+  background:transparent;
+  border-top:none;
+  padding-top:10px;
+}
+
+
+
+.hero-kicker,.header-kicker{font-size:0.6875rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:#98a2b3;margin-bottom:8px}
+.hero-title,.header-title{
+  font-family:'Lora',serif;
+  font-size:clamp(calc(34px * var(--font-scale)), calc(6vw * var(--font-scale)), calc(78px * var(--font-scale)));
+  line-height:0.96;
+  font-weight:600;
+  letter-spacing:-.04em;
+  max-width:10ch;
+  background:linear-gradient(180deg,#111214 0%, #1b1c1f 52%, #2a2b31 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-wrap:balance;
+}
+.hero-sub,.header-sub{
+  font-size:clamp(calc(18px * var(--font-scale)), calc(2.2vw * var(--font-scale)), calc(22px * var(--font-scale)));
+  color:#667085;
+  margin-top:16px;
+  max-width:700px;
+  line-height:1.62;
+}
+.hero-sub strong{
+  display:block;
+  font-size:clamp(calc(22px * var(--font-scale)), calc(2.6vw * var(--font-scale)), calc(28px * var(--font-scale)));
+  font-weight:700;
+  color:var(--dark);
+  margin-bottom:8px;
+  line-height:1.2;
+}
+.hero-grid,.landing-hero{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:42px;align-items:center;width:100%}
+.hero-shell,.hero-card-shell{
+  position:relative;
+  width:100%;
+  max-width:1160px;
+  margin:0 auto;
+  padding:10px 4px 26px;
+  background:transparent;
+  border:none;
+  box-shadow:none;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+  overflow:visible;
+  isolation:isolate;
+}
+.hero-shell::before,.hero-card-shell::before{display:none;}
+.hero-shell::after,.hero-card-shell::after{
+  display:none;
+}
+.hero-shell > *, .hero-card-shell > *{position:relative;z-index:1}
+
+.hero-copy,.landing-copy{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.hero-actions,.landing-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.hero-meta,.landing-note{margin-top:14px;font-size:0.8125rem;color:var(--mid);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hero-badge,.landing-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:#fff;border:1px solid var(--border);font-size:0.75rem;font-weight:600;color:var(--dark)}
+.hero-preview,.landing-preview{display:grid;gap:14px}
+.preview-frame{
+  background:linear-gradient(180deg, rgba(255,255,255,.82), rgba(248,250,252,.72));
+  border:1px solid rgba(255,255,255,.78);
+  border-radius:28px;
+  padding:18px;
+  box-shadow:
+    0 26px 80px rgba(15,23,42,.10),
+    0 8px 24px rgba(15,23,42,.05),
+    inset 0 1px 0 rgba(255,255,255,.90);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  position:relative;
+  overflow:hidden
+}
+.preview-frame::before{content:'';position:absolute;inset:auto -40px -70px auto;width:170px;height:170px;background:radial-gradient(circle, rgba(91,141,184,.14), transparent 70%);pointer-events:none}
+.preview-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.preview-kicker{font-size:0.6875rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#98a2b3}
+.preview-pills{display:flex;gap:6px}
+.preview-pills span{width:8px;height:8px;border-radius:50%;background:#d0d5dd}
+.preview-panel{display:grid;gap:12px}
+.preview-card{
+  border:1px solid rgba(226,232,240,.92);
+  border-radius:22px;
+  background:rgba(255,255,255,.78);
+  padding:14px 14px 12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.82);
+}
+.preview-card h3{font-size:0.875rem;font-weight:600;margin-bottom:6px}
+.preview-card p{font-size:0.7812rem;color:var(--mid);line-height:1.55}
+.preview-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;font-size:0.6875rem;color:var(--mid)}
+.preview-tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;background:#f8fafc;border:1px solid var(--border);font-weight:700;color:#475467}
+.preview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.preview-mini{
+  border:1px solid rgba(226,232,240,.92);
+  border-radius:20px;
+  background:rgba(255,255,255,.76);
+  padding:12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+}
+.preview-mini strong{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.preview-mini span{font-size:0.75rem;color:var(--mid);line-height:1.5}
+@media(max-width:900px){.hero-grid,.landing-hero{grid-template-columns:1fr;gap:28px}.hero-title,.header-title{max-width:12ch}.hero-preview,.landing-preview{order:2}.hero-copy,.landing-copy{order:1}.hero-shell,.hero-card-shell{padding:6px 0 22px}
+  .preview-status-row{grid-template-columns:1fr}
+  .preview-grid{grid-template-columns:1fr 1fr}}
+
+.onboard-shell{display:flex;flex-direction:column;gap:18px}
+.onboard-progress{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.onboard-progress-line{height:2px;flex:1 1 70px;background:var(--border);border-radius:999px;position:relative;overflow:hidden;max-width:84px}
+.onboard-progress-line::after{content:'';position:absolute;inset:0;transform-origin:left center;transform:scaleX(var(--fill,0));background:var(--dark);transition:transform .24s ease}
+.onboard-pill{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--mid);font-size:0.75rem;font-weight:700;transition:all .2s ease}
+.onboard-pill.active{background:#111827;color:#fff;border-color:#111827}
+.onboard-pill.done{background:#eef2ff;color:#4338ca;border-color:#c7d2fe}
+.onboard-step{display:none;animation:fadeU .24s ease both}
+.onboard-step.active{display:grid}
+.onboard-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(250px,.85fr);gap:18px;align-items:start}
+.onboard-panel{padding:10px 4px 4px}
+.onboard-title{font-family:'Lora',serif;font-size:2.125rem;line-height:1.12;margin-bottom:10px}
+.onboard-title em{font-style:italic;color:var(--knowledge)}
+.onboard-copy{font-size:0.9375rem;color:var(--mid);line-height:1.7;max-width:58ch}
+.onboard-mini{margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--mid);font-size:0.8125rem;font-weight:600}
+.onboard-card-stack{display:grid;gap:12px}
+.onboard-sidecard{background:#fafaf8;border:1px solid var(--border);border-radius:16px;padding:16px}
+.onboard-sidecard h3{font-size:0.8125rem;margin-bottom:6px}
+.onboard-sidecard p{font-size:0.8125rem;color:var(--mid);line-height:1.6}
+.onboard-grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+.onboard-feature{background:#fafaf8;border:1px solid var(--border);border-radius:16px;padding:16px}
+.onboard-feature h3{font-size:0.875rem;margin-bottom:6px}
+.onboard-feature p{font-size:0.8125rem;color:var(--mid);line-height:1.6}
+.onboard-phase-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.onboard-phase-card{background:#fafaf8;border:1px solid var(--border);border-radius:16px;padding:16px}
+.onboard-phase-card h3{font-size:0.9375rem;margin:10px 0 6px}
+.onboard-phase-card p{font-size:0.8125rem;color:var(--mid);line-height:1.55}
+.onboard-phase-badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:0.6875rem;font-weight:700}
+.onboard-actions{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}
+.onboard-actions-left,.onboard-actions-right{display:flex;gap:10px;flex-wrap:wrap}
+.onboard-ghost{background:transparent;border:1px solid var(--border);color:var(--mid)}
+.onboard-highlight{background:linear-gradient(135deg,#f8fafc,#fbfaf7);border:1px solid var(--border);border-radius:18px;padding:18px}
+.onboard-highlight h3{font-size:0.8125rem;margin-bottom:8px}
+.onboard-highlight p{font-size:0.8125rem;color:var(--mid);line-height:1.6}
+.onboard-checklist{display:grid;gap:10px;margin-top:12px}
+.onboard-check{display:flex;gap:10px;align-items:flex-start;font-size:0.8125rem;color:var(--mid)}
+.onboard-check strong{color:var(--dark)}
+.onboard-check-dot{width:20px;height:20px;border-radius:999px;background:#eef2ff;color:#4338ca;display:flex;align-items:center;justify-content:center;font-size:0.6875rem;font-weight:700;flex-shrink:0;margin-top:1px}
+@media(max-width:760px){.onboard-layout,.onboard-phase-row,.onboard-grid-2{grid-template-columns:1fr}.onboard-title{font-size:1.75rem}}
+
+/* Phase slider / carousel */
+.phase-carousel-nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin:18px 0 14px;
+  padding:10px 14px;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:rgba(255,255,255,.74);
+  box-shadow:0 1px 2px rgba(16,24,40,.04);
+}
+.phase-nav-pills{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.phase-nav-pill,
+.phase-nav-btn{
+  appearance:none;
+  border:none;
+  background:transparent;
+  color:var(--mid);
+  font-family:'DM Sans',sans-serif;
+  font-size:0.8125rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:background .2s ease, color .2s ease, box-shadow .2s ease, opacity .2s ease, transform .2s ease;
+}
+.phase-nav-pill{
+  padding:8px 12px;
+  border-radius:999px;
+}
+.phase-nav-pill:hover,
+.phase-nav-btn:hover{
+  background:#f6f8fb;
+  color:var(--dark);
+}
+.phase-nav-pill.active{
+  background:#ffffff;
+  color:#4338ca;
+  box-shadow:0 1px 2px rgba(16,24,40,.05), 0 0 0 1px rgba(67,56,202,.08);
+}
+.phase-nav-pill.locked{
+  opacity:.45;
+}
+.phase-nav-btn{
+  width:36px;
+  height:36px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1rem;
+  background:#fff;
+  border:1px solid var(--border);
+  flex-shrink:0;
+}
+.phase-nav-btn:disabled{
+  opacity:.38;
+  cursor:not-allowed;
+}
+.phase-flow{
+  position:relative;
+}
+.phase-section{
+  display:none;
+  will-change:transform,opacity;
+}
+.phase-section.active-slide{
+  display:block;
+}
+.phase-section.animating-in.slide-in-right{
+  animation:slideInRight .32s cubic-bezier(.22,1,.36,1) both;
+}
+.phase-section.animating-in.slide-in-left{
+  animation:slideInLeft .32s cubic-bezier(.22,1,.36,1) both;
+}
+.phase-section.animating-out{
+  position:absolute;
+  top:0;left:0;right:0;
+  pointer-events:none;
+}
+.phase-section.animating-out.slide-out-left{
+  animation:slideOutLeft .32s cubic-bezier(.22,1,.36,1) both;
+}
+.phase-section.animating-out.slide-out-right{
+  animation:slideOutRight .32s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes slideInRight{
+  from{opacity:0;transform:translateX(40px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes slideInLeft{
+  from{opacity:0;transform:translateX(-40px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes slideOutLeft{
+  from{opacity:1;transform:translateX(0)}
+  to{opacity:0;transform:translateX(-40px)}
+}
+@keyframes slideOutRight{
+  from{opacity:1;transform:translateX(0)}
+  to{opacity:0;transform:translateX(40px)}
+}
+.phase-section .phase-body{
+  display:block;
+}
+.phase-section .phase-toggle-btn{
+  display:none !important;
+}
+@media(max-width:760px){
+  .phase-carousel-nav{
+    padding:8px 10px;
+    gap:10px;
+  }
+  .phase-nav-pills{
+    gap:6px;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .phase-nav-pills::-webkit-scrollbar{
+    display:none;
+  }
+  .phase-nav-pill{
+    white-space:nowrap;
+    flex:0 0 auto;
+  }
+}
+
+
+/* Apple-style phase slider */
+.apple-phase-nav{
+  max-width:760px;
+  margin:18px auto 16px;
+  padding:12px;
+  border-radius:28px;
+  background:rgba(255,255,255,.86);
+  border:1px solid rgba(17,24,39,.08);
+  box-shadow:0 12px 34px rgba(16,24,40,.08), inset 0 1px 0 rgba(255,255,255,.9);
+  backdrop-filter:blur(16px);
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr) 44px;
+  align-items:center;
+  gap:14px;
+}
+.phase-nav-center{
+  min-width:0;
+  display:grid;
+  gap:12px;
+}
+.phase-nav-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.phase-nav-kicker{
+  font-size:0.6875rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#98a2b3;
+}
+.phase-nav-status{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:0 12px;
+  border-radius:999px;
+  background:#f8fafc;
+  border:1px solid var(--border);
+  font-size:0.75rem;
+  font-weight:700;
+  color:#475467;
+}
+.phase-progress-track{
+  position:relative;
+  height:10px;
+  display:flex;
+  align-items:center;
+}
+.phase-progress-line,
+.phase-progress-fill{
+  position:absolute;
+  left:0;
+  top:50%;
+  transform:translateY(-50%);
+  height:4px;
+  border-radius:999px;
+}
+.phase-progress-line{
+  width:100%;
+  background:linear-gradient(90deg,#e5e7eb 0%, #e7eaf0 100%);
+}
+.phase-progress-fill{
+  width:0%;
+  background:linear-gradient(90deg,#c7d2fe 0%, #818cf8 52%, #4f46e5 100%);
+  box-shadow:0 0 0 1px rgba(79,70,229,.04), 0 6px 18px rgba(79,70,229,.22);
+  transition:width .32s ease;
+}
+.apple-phase-nav .phase-nav-pills{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.apple-phase-nav .phase-nav-pill{
+  position:relative;
+  isolation:isolate;
+  min-width:0;
+  padding:12px 14px;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.42);
+  background:linear-gradient(180deg,rgba(255,255,255,.58) 0%, rgba(248,250,252,.86) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.78), 0 10px 22px rgba(15,23,42,.04);
+  backdrop-filter:blur(10px) saturate(130%);
+  -webkit-backdrop-filter:blur(10px) saturate(130%);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  justify-content:flex-start;
+  text-align:left;
+  overflow:hidden;
+}
+.apple-phase-nav .phase-nav-pill::before{
+  content:'';
+  position:absolute;
+  inset:1px;
+  border-radius:inherit;
+  background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,.08));
+  opacity:0;
+  transition:opacity .28s ease;
+  z-index:-1;
+}
+.apple-phase-nav .phase-nav-pill::after{
+  content:'';
+  position:absolute;
+  inset:-45% auto auto -20%;
+  width:58%;
+  height:150%;
+  background:linear-gradient(115deg,rgba(255,255,255,.72) 0%, rgba(255,255,255,.15) 42%, rgba(255,255,255,0) 70%);
+  transform:translateX(-110%) rotate(12deg);
+  opacity:0;
+  transition:transform .7s ease, opacity .35s ease;
+  pointer-events:none;
+}
+.apple-phase-nav .phase-nav-pill:hover{
+  background:linear-gradient(180deg,rgba(255,255,255,.72) 0%, rgba(248,250,252,.96) 100%);
+  transform:translateY(-1px);
+}
+.apple-phase-nav .phase-nav-pill:hover::after,
+.apple-phase-nav .phase-nav-pill.active::after{
+  transform:translateX(190%) rotate(12deg);
+  opacity:.95;
+}
+.apple-phase-nav .phase-nav-pill.active{
+  background:linear-gradient(180deg,rgba(255,255,255,.72) 0%, rgba(237,242,255,.82) 45%, rgba(228,236,255,.74) 100%);
+  color:#271f7a;
+  border-color:rgba(255,255,255,.5);
+  box-shadow:0 18px 40px rgba(99,102,241,.18), 0 0 0 1px rgba(99,102,241,.10), inset 0 1px 0 rgba(255,255,255,.88), inset 0 -16px 40px rgba(99,102,241,.08);
+  backdrop-filter:blur(18px) saturate(165%);
+  -webkit-backdrop-filter:blur(18px) saturate(165%);
+  transform:translateY(-2px) scale(1.01);
+}
+.apple-phase-nav .phase-nav-pill.active::before{
+  opacity:1;
+}
+.apple-phase-nav .phase-nav-pill.locked{
+  opacity:.5;
+  filter:saturate(.72);
+}
+.phase-pill-step{
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#ffffff;
+  border:1px solid rgba(17,24,39,.08);
+  font-size:0.6875rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  color:#667085;
+}
+.apple-phase-nav .phase-nav-pill.active .phase-pill-step{
+  background:linear-gradient(180deg,rgba(255,255,255,.82) 0%, rgba(224,231,255,.92) 100%);
+  border-color:rgba(99,102,241,.16);
+  color:#4338ca;
+  box-shadow:0 8px 18px rgba(99,102,241,.18), inset 0 1px 0 rgba(255,255,255,.85);
+}
+.phase-pill-copy{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.phase-pill-copy strong{
+  font-size:0.875rem;
+  line-height:1.2;
+  color:var(--dark);
+}
+.phase-pill-copy small{
+  font-size:0.7188rem;
+  line-height:1.35;
+  color:var(--mid);
+}
+.apple-phase-nav .phase-nav-arrow{
+  width:44px;
+  height:44px;
+  border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.76),rgba(255,255,255,.58));
+  border:1px solid rgba(255,255,255,.48);
+  box-shadow:0 10px 24px rgba(16,24,40,.08), inset 0 1px 0 rgba(255,255,255,.78);
+  backdrop-filter:blur(14px) saturate(150%);
+  -webkit-backdrop-filter:blur(14px) saturate(150%);
+}
+.apple-phase-nav .phase-nav-arrow:hover:not(:disabled){
+  background:#fff;
+}
+.apple-phase-nav .phase-nav-arrow:disabled{
+  opacity:.38;
+  box-shadow:none;
+}
+@media(max-width:760px){
+  .apple-phase-nav{
+    max-width:100%;
+    grid-template-columns:40px minmax(0,1fr) 40px;
+    padding:10px;
+    gap:10px;
+    border-radius:24px;
+  }
+  .phase-nav-meta{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .apple-phase-nav .phase-nav-pills{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    scrollbar-width:none;
+    padding-bottom:2px;
+  }
+  .apple-phase-nav .phase-nav-pills::-webkit-scrollbar{
+    display:none;
+  }
+  .apple-phase-nav .phase-nav-pill{
+    flex:0 0 220px;
+  }
+  .apple-phase-nav .phase-nav-arrow{
+    width:40px;
+    height:40px;
+  }
+}
+
+/* Phase accordion quadrant matrix */
+.phase-flow{position:relative;display:block;margin-top:18px}
+.phase-section{background:linear-gradient(180deg,rgba(255,255,255,.74),rgba(255,255,255,.92));border:1px solid rgba(255,255,255,.52);border-radius:22px;box-shadow:0 1px 2px rgba(16,24,40,.05),0 18px 44px rgba(16,24,40,.08), inset 0 1px 0 rgba(255,255,255,.8);overflow:hidden;backdrop-filter:blur(18px) saturate(145%);-webkit-backdrop-filter:blur(18px) saturate(145%);display:none}
+.phase-section.active-slide{display:block}
+.phase-section.animating-in,.phase-section.animating-out{display:block;position:absolute;inset:0;width:100%}
+.phase-section.animating-in{z-index:3}
+.phase-section.animating-out{z-index:2;pointer-events:none}
+.phase-section.slide-in-right{animation:phaseSlideInRight .6s cubic-bezier(.22,.61,.36,1) both}
+.phase-section.slide-in-left{animation:phaseSlideInLeft .6s cubic-bezier(.22,.61,.36,1) both}
+.phase-section.slide-out-left{animation:phaseSlideOutLeft .52s cubic-bezier(.4,0,.2,1) both}
+.phase-section.slide-out-right{animation:phaseSlideOutRight .52s cubic-bezier(.4,0,.2,1) both}
+@keyframes phaseSlideInRight{from{opacity:0;transform:translateX(72px) scale(.985);filter:blur(8px)}to{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}}
+@keyframes phaseSlideInLeft{from{opacity:0;transform:translateX(-72px) scale(.985);filter:blur(8px)}to{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}}
+@keyframes phaseSlideOutLeft{from{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}to{opacity:0;transform:translateX(-64px) scale(.985);filter:blur(8px)}}
+@keyframes phaseSlideOutRight{from{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}to{opacity:0;transform:translateX(64px) scale(.985);filter:blur(8px)}}
+.phase-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px}
+.phase-header-main{display:flex;align-items:flex-start;gap:14px;min-width:0;flex:1}
+.phase-header-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.phase-toggle-btn{width:32px;height:32px;border-radius:999px;border:1px solid transparent;background:transparent;color:var(--mid);display:grid;place-items:center;font-size:1rem;line-height:1;cursor:pointer;opacity:.28;pointer-events:none;transform:rotate(0deg) scale(1);transform-origin:center center;will-change:transform;transition:transform .32s cubic-bezier(.4,0,.2,1),opacity .22s ease,background .22s ease,color .22s ease,box-shadow .22s ease,border-color .22s ease}
+.phase-section:hover .phase-toggle-btn,.phase-section:focus-within .phase-toggle-btn,.phase-section.expanded .phase-toggle-btn{opacity:1;pointer-events:auto}
+.phase-toggle-btn:hover,.phase-toggle-btn:focus-visible{background:#f5f7fa;border-color:var(--border);color:var(--dark);transform:rotate(0deg) scale(1.04);box-shadow:0 6px 16px rgba(16,24,40,.08)}
+.phase-header-main{display:flex;align-items:flex-start;gap:14px;min-width:0}
+.phase-step{width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:0.8125rem;font-weight:700;color:#fff;flex-shrink:0}
+.phase-step.phase-1{background:var(--phase1)}
+.phase-step.phase-2{background:var(--phase2)}
+.phase-step.phase-3{background:var(--phase3)}
+.phase-header-copy h3{font-size:1.125rem;font-weight:600;line-height:1.2;margin-bottom:4px}
+.phase-header-copy p{font-size:0.8125rem;color:var(--mid);line-height:1.55}
+.phase-header-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.phase-chip{display:inline-flex;align-items:center;justify-content:center;padding:6px 11px;border-radius:999px;font-size:0.6875rem;font-weight:700;border:1px solid var(--border);background:#f8fafc;color:var(--mid)}
+.phase-chip.complete{background:#eef7f2;color:var(--success);border-color:rgba(62,124,93,.18)}
+.phase-chip.locked{background:#f5f5f5;color:#98a2b3}
+.phase-arrow{font-size:1.125rem;color:var(--mid);transition:transform .2s ease}
+.phase-section.expanded .phase-toggle-btn{transform:rotate(180deg) scale(1)}
+.phase-section.expanded .phase-toggle-btn:hover,.phase-section.expanded .phase-toggle-btn:focus-visible{transform:rotate(180deg) scale(1.04)}
+.phase-body{display:none;padding:0 20px 20px}
+.phase-section.expanded .phase-body{display:block;animation:fadeU .22s ease both}
+.phase-body-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px;padding-top:4px}
+.phase-body-top p{font-size:0.8125rem;color:var(--mid);max-width:58ch}
+.phase-progress{font-size:0.75rem;color:var(--mid);font-weight:600;white-space:nowrap}
+.quadrant-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.phase-quadrant{min-height:250px;padding:18px 18px 16px !important;display:flex;flex-direction:column}
+.phase-quadrant .cell-title{margin-bottom:8px}
+.quadrant-kicker{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.quadrant-label{display:inline-flex;align-items:center;gap:7px;font-size:0.6875rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--mid)}
+.quadrant-label .dot{width:10px;height:10px}
+.quadrant-status{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:4px 10px;border-radius:999px;font-size:0.6875rem;font-weight:600;line-height:1;white-space:nowrap;background:#f4f4f5;color:#71717a;}
+.phase-quadrant.completed .quadrant-status{background:rgba(62,124,93,.12);color:var(--success)}
+.phase-quadrant .cell-detail{display:block;margin-top:12px;padding-top:12px}
+.phase-quadrant .cell-detail ul{padding-left:18px;line-height:1.8}
+.phase-quadrant .cell-detail li+li{margin-top:2px}
+.phase-actions{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px}
+.phase-note{font-size:0.6875rem;color:var(--mid);font-style:italic}
+.phase-open-label{font-size:0.6875rem;font-weight:600;color:var(--mid)}
+.phase-locked-cover{margin-top:12px;padding:16px;border:1px dashed var(--border);border-radius:14px;background:#fbfbfc;font-size:0.8125rem;color:var(--mid)}
+@media(max-width:760px){.quadrant-grid{grid-template-columns:1fr}.phase-header{padding:16px}.phase-body{padding:0 16px 16px}.phase-body-top{flex-direction:column}.phase-header-meta{justify-content:flex-start}.phase-toggle-btn{opacity:1;pointer-events:auto}}
+
+
+/* ===== Unified icon system ===== */
+:root{
+  --icon-success:#2f855a;
+  --icon-success-bg:#eaf7ef;
+  --icon-progress:#4f7fb3;
+  --icon-progress-bg:#edf4fb;
+  --icon-neutral:#667085;
+  --icon-neutral-bg:#f4f6f8;
+  --icon-stroke:1.9;
+}
+
+.nav-tab svg,
+.m-icon-wrap svg,
+.phase-circle svg,
+.preview-card svg,
+.preview-mini svg,
+.onboard-phase-badge svg,
+.preview-tag svg{
+  stroke-width:var(--icon-stroke) !important;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  opacity:.8;
+  transition:
+    opacity .18s ease,
+    transform .18s ease,
+    color .18s ease,
+    stroke .18s ease;
+}
+
+.nav-tab:hover svg,
+.m-item:hover .m-icon-wrap svg,
+.phase-section:hover .phase-toggle-btn svg,
+.preview-card:hover svg,
+.preview-mini:hover svg,
+.onboard-phase-card:hover svg,
+.preview-tag:hover svg{
+  opacity:1;
+  transform:scale(1.02);
+}
+
+.nav-tab.active svg{
+  opacity:1;
+}
+
+.m-icon-wrap{
+  background:var(--icon-neutral-bg) !important;
+  color:var(--icon-neutral) !important;
+  border-color:rgba(16,24,40,.06) !important;
+}
+
+.m-item:nth-child(1) .m-icon-wrap{
+  background:var(--icon-progress-bg) !important;
+  color:var(--icon-progress) !important;
+}
+
+.m-item:nth-child(2) .m-icon-wrap{
+  background:var(--icon-progress-bg) !important;
+  color:var(--icon-progress) !important;
+}
+
+.m-item:nth-child(3) .m-icon-wrap{
+  background:#fbefed !important;
+  color:#c0695a !important;
+}
+
+.m-item:nth-child(4) .m-icon-wrap{
+  background:#f3eef7 !important;
+  color:#7b6e8a !important;
+}
+
+.m-item:nth-child(5) .m-icon-wrap{
+  background:var(--icon-success-bg) !important;
+  color:var(--icon-success) !important;
+}
+
+.phase-circle{
+  background:var(--icon-progress-bg) !important;
+  color:var(--icon-progress) !important;
+  border-color:rgba(79,127,179,.12) !important;
+}
+
+.preview-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:var(--icon-progress-bg) !important;
+  color:var(--icon-progress) !important;
+  border-color:rgba(79,127,179,.12) !important;
+}
+
+.preview-card svg,
+.preview-mini svg{
+  color:var(--icon-progress);
+}
+
+.nav-tab svg{
+  opacity:.8;
+}
+
+.nav-tab:hover svg{
+  opacity:1;
+}
+
+@media (max-width:680px){
+  .nav-tab svg,
+  .m-icon-wrap svg,
+  .phase-circle svg{
+    transform:none;
+  }
+}
+/* simplified showcase layout after removing redundant metrics */
+.showcase-shell{
+  gap:16px;
+}
+.storyline-card{
+  margin-top:0;
+}
+.storyline-card .showcase-card:first-child{
+  min-height:100%;
+}
+@media(max-width:900px){
+  .showcase-shell{
+    gap:14px;
+  }
+}
+/* Version A: experience-first */
+.showcase-shell{
+  gap:14px !important;
+  padding-top:8px;
+}
+.storyline-card{
+  margin-top:0;
+}
+
+
+/* Soft white highlight refinement */
+.apple-phase-nav .phase-nav-pill{
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.74), 0 10px 22px rgba(15,23,42,.035);
+}
+.apple-phase-nav .phase-nav-pill::after{
+  inset:0;
+  width:auto;
+  height:auto;
+  border-radius:inherit;
+  background:linear-gradient(120deg,
+    rgba(255,255,255,.30) 0%,
+    rgba(255,255,255,.14) 34%,
+    rgba(255,255,255,.05) 58%,
+    rgba(255,255,255,0) 100%);
+  transform:none;
+  opacity:0;
+  transition:opacity .28s ease;
+}
+.apple-phase-nav .phase-nav-pill:hover::after,
+.apple-phase-nav .phase-nav-pill.active::after{
+  transform:none;
+  opacity:.9;
+}
+.apple-phase-nav .phase-nav-pill.active{
+  background:rgba(255,255,255,.66);
+  color:#1d1d1f;
+  border-color:rgba(255,255,255,.48);
+  box-shadow:
+    0 10px 24px rgba(15,23,42,.07),
+    0 0 0 1px rgba(255,255,255,.16),
+    inset 0 1px 0 rgba(255,255,255,.72),
+    inset 0 -1px 0 rgba(255,255,255,.24);
+  backdrop-filter:blur(16px) saturate(140%);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);
+}
+.apple-phase-nav .phase-nav-pill.active::before{
+  background:linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.08));
+  opacity:1;
+}
+.apple-phase-nav .phase-nav-pill.active .phase-pill-step{
+  background:rgba(255,255,255,.86);
+  border-color:rgba(255,255,255,.52);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8), 0 4px 10px rgba(15,23,42,.05);
+}
+
+
+/* ===== Portfolio-polished hero refinement ===== */
+.site-header{
+  padding:44px 24px 26px;
+}
+.hero-shell,.hero-card-shell{
+  padding:12px 4px 30px;
+  isolation:isolate;
+}
+.hero-shell::before,.hero-card-shell::before{
+  inset:-42px -32px -22px -32px;
+  background:
+    radial-gradient(circle at 10% 8%, rgba(255,255,255,.92), transparent 24%),
+    radial-gradient(circle at 82% 14%, rgba(91,141,184,.12), transparent 24%),
+    radial-gradient(circle at 72% 82%, rgba(74,140,111,.08), transparent 18%),
+    linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,0));
+  filter:blur(12px);
+}
+.hero-grid,.landing-hero{
+  grid-template-columns:minmax(0,1.02fr) minmax(360px,.98fr);
+  gap:34px;
+}
+.hero-copy,.landing-copy{max-width:630px}
+.hero-kicker,.header-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  letter-spacing:.12em;
+  margin-bottom:12px;
+}
+.hero-kicker::before,.header-kicker::before{
+  content:'';
+  width:30px;
+  height:1px;
+  background:linear-gradient(90deg, rgba(17,24,39,.65), rgba(17,24,39,0));
+}
+.hero-title,.header-title{
+  font-size:clamp(calc(42px * var(--font-scale)), calc(6.2vw * var(--font-scale)), calc(80px * var(--font-scale)));
+  line-height:.94;
+  letter-spacing:-.05em;
+  max-width:11ch;
+  background:linear-gradient(180deg,#111214 0%, #1a1d24 46%, #374151 100%);
+}
+.hero-sub,.header-sub{
+  margin-top:18px;
+  max-width:62ch;
+  line-height:1.68;
+}
+.hero-actions,.landing-actions{margin-top:28px}
+.hero-actions .header-chip,
+.hero-actions .chip-btn,
+.landing-actions .header-chip,
+.landing-actions .chip-btn{
+  min-height:46px;
+  padding:0 18px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:0.7812rem;
+  font-weight:700;
+  text-decoration:none;
+}
+.hero-actions .header-chip,
+.landing-actions .header-chip{
+  background:linear-gradient(180deg,#111827 0%, #0f172a 100%) !important;
+  color:#fff !important;
+  border:1px solid rgba(17,24,39,.94) !important;
+  box-shadow:0 16px 34px rgba(15,23,42,.16), inset 0 1px 0 rgba(255,255,255,.08) !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+.hero-actions .header-chip::after,
+.landing-actions .header-chip::after{
+  content:'→';
+  font-size:0.875rem;
+  line-height:1;
+}
+.hero-actions .chip-btn.secondary,
+.landing-actions .chip-btn.secondary{
+  background:rgba(255,255,255,.72) !important;
+  color:var(--dark) !important;
+  border:1px solid rgba(255,255,255,.82) !important;
+  box-shadow:0 10px 26px rgba(15,23,42,.06), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.hero-meta,.landing-note{margin-top:16px}
+.hero-badge,.landing-badge{
+  min-height:34px;
+  padding:0 12px;
+  background:rgba(255,255,255,.82);
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 8px 22px rgba(15,23,42,.04), inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+.hero-preview,.landing-preview{position:relative;display:flex;align-items:center}
+.preview-frame{
+  position:relative;
+  width:100%;
+  padding:22px;
+  border-radius:32px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.90), rgba(248,250,252,.82)),
+    radial-gradient(circle at 88% 14%, rgba(91,141,184,.08), transparent 24%);
+  border:1px solid rgba(255,255,255,.88);
+  box-shadow:
+    0 32px 84px rgba(15,23,42,.12),
+    0 10px 28px rgba(15,23,42,.06),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  backdrop-filter:blur(20px) saturate(145%);
+  -webkit-backdrop-filter:blur(20px) saturate(145%);
+  overflow:hidden;
+}
+.preview-frame::before{
+  content:'';
+  position:absolute;
+  inset:auto -48px -76px auto;
+  width:220px;
+  height:220px;
+  background:radial-gradient(circle, rgba(91,141,184,.18), transparent 72%);
+  pointer-events:none;
+}
+.preview-frame::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg, rgba(255,255,255,.42), rgba(255,255,255,0) 42%);
+  pointer-events:none;
+}
+.preview-top{position:relative;z-index:1;margin-bottom:18px}
+.preview-kicker{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.preview-kicker strong{
+  font-size:0.9375rem;
+  font-weight:700;
+  letter-spacing:-.01em;
+  text-transform:none;
+  color:#111827;
+}
+.preview-panel{
+  position:relative;
+  z-index:1;
+  gap:14px;
+}
+.preview-card{
+  border:1px solid rgba(226,232,240,.95);
+  border-radius:24px;
+  background:rgba(255,255,255,.88);
+  padding:18px 18px 16px;
+  box-shadow:0 14px 30px rgba(15,23,42,.07), inset 0 1px 0 rgba(255,255,255,.86);
+}
+.preview-card h3{
+  font-size:0.9375rem;
+  font-weight:700;
+  margin-bottom:8px;
+  color:#111827;
+  line-height:1.35;
+}
+.preview-card p{
+  font-size:0.8rem;
+  line-height:1.65;
+}
+.preview-meta{
+  margin-top:13px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.preview-tag{padding:5px 9px}
+.preview-status-row{
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:12px;
+}
+.preview-status-card,
+.preview-stat-card,
+.preview-mini{
+  position:relative;
+  border:1px solid rgba(226,232,240,.96);
+  border-radius:22px;
+  background:rgba(255,255,255,.82);
+  box-shadow:0 10px 18px rgba(15,23,42,.05), inset 0 1px 0 rgba(255,255,255,.84);
+}
+.preview-status-card{padding:15px 15px 13px}
+.preview-status-label{
+  font-size:0.6562rem;
+  font-weight:700;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:#98a2b3;
+}
+.preview-progress-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:8px;
+  font-size:0.7812rem;
+  font-weight:700;
+  color:#111827;
+}
+.preview-progress-bar{
+  height:10px;
+  margin-top:12px;
+  border-radius:999px;
+  background:#e9eef5;
+  overflow:hidden;
+}
+.preview-progress-bar span{
+  display:block;
+  width:62%;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg, var(--tasks), #8bb3d3);
+}
+.preview-progress-note{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:10px;
+  font-size:0.7188rem;
+  color:var(--mid);
+}
+.preview-progress-note i{width:14px;height:14px;color:var(--knowledge)}
+.preview-stat-card{
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.preview-stat-card strong{
+  font-size:1.875rem;
+  line-height:1;
+  font-family:'Lora',serif;
+  color:#111827;
+}
+.preview-stat-card span{
+  display:block;
+  font-size:0.7188rem;
+  line-height:1.48;
+  color:var(--mid);
+  margin-top:6px;
+}
+.preview-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.preview-mini{
+  padding:14px;
+}
+.preview-mini strong{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:0.8125rem;
+  color:#111827;
+}
+.preview-mini i{width:15px;height:15px}
+.preview-mini span{
+  display:block;
+  margin-top:7px;
+  font-size:0.75rem;
+  line-height:1.55;
+  color:var(--mid);
+}
+.preview-frame:hover{
+  transform:translateY(-2px);
+  transition:transform .22s ease, box-shadow .22s ease;
+  box-shadow:
+    0 36px 88px rgba(15,23,42,.14),
+    0 12px 30px rgba(15,23,42,.07),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+body.hc .preview-status-card,
+body.hc .preview-stat-card,
+body.hc .preview-mini,
+body.hc .preview-card{
+  background:var(--surface) !important;
+  border-color:var(--border) !important;
+  box-shadow:none !important;
+}
+
+@media(max-width:900px){
+  .hero-grid,.landing-hero{grid-template-columns:1fr;gap:28px}
+  .hero-title,.header-title{max-width:12ch}
+  .hero-preview,.landing-preview{order:2;max-height:480px;overflow:hidden}
+  .preview-frame{max-height:480px;overflow:hidden}
+  .hero-copy,.landing-copy{order:1;max-width:none}
+  .hero-shell,.hero-card-shell{padding:6px 0 22px}
+  .preview-status-row{grid-template-columns:1fr}
+  .preview-grid{grid-template-columns:1fr 1fr}
+  .preview-floating-note{position:static;max-width:none}
+}
+@media(max-width:640px){
+  .site-header{padding:28px 14px 18px}
+  .hero-grid,.landing-hero{gap:22px}
+  .hero-actions,.landing-actions{width:100%}
+  .hero-actions .header-chip,
+  .hero-actions .chip-btn,
+  .landing-actions .header-chip,
+  .landing-actions .chip-btn{flex:1 1 100%}
+  .hero-meta,.landing-note{gap:8px}
+  .preview-grid,
+  .preview-status-row{grid-template-columns:1fr}
+  .preview-frame{padding:16px;border-radius:24px}
+}
+
+
+
+/* ===== Unified portfolio system refinement ===== */
+:root{
+  --ui-card-bg:linear-gradient(180deg, rgba(255,255,255,.86), rgba(248,250,252,.76));
+  --ui-card-border:1px solid rgba(17,24,39,.08);
+  --ui-card-shadow:0 18px 44px rgba(15,23,42,.06), 0 4px 16px rgba(15,23,42,.035), inset 0 1px 0 rgba(255,255,255,.92);
+  --ui-card-shadow-hover:0 24px 54px rgba(15,23,42,.08), 0 10px 22px rgba(15,23,42,.05), inset 0 1px 0 rgba(255,255,255,.94);
+  --ui-radius-xl:28px;
+  --ui-radius-lg:22px;
+  --ui-radius-md:18px;
+  --ui-kicker:#98a2b3;
+  --ui-text:#475467;
+  --ui-surface-soft:#f8fafc;
+  --ui-stroke:rgba(226,232,240,.92);
+  --ui-accent:linear-gradient(135deg, rgba(91,141,184,.16), rgba(74,140,111,.08));
+}
+
+.showcase-card,
+.summary-apple,
+.metric-card,
+.apple-phase-nav,
+.phase-section,
+.preview-frame{
+  position:relative;
+  background:var(--ui-card-bg);
+  border:var(--ui-card-border);
+  box-shadow:var(--ui-card-shadow);
+  backdrop-filter:blur(16px) saturate(140%);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);
+}
+
+.hero-shell{
+  position:relative;
+}
+
+.summary-apple,
+.preview-frame,
+.apple-phase-nav,
+.phase-section{
+  border-radius:var(--ui-radius-xl);
+}
+
+.showcase-card,
+.metric-card,
+.tabs-list{
+  border-radius:24px !important;
+}
+
+.showcase-card::before,
+.metric-card::before,
+.phase-section::before,
+.preview-frame::after,
+.summary-apple::after,
+.apple-phase-nav::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(135deg, rgba(255,255,255,.26), rgba(255,255,255,0) 38%);
+  opacity:.8;
+}
+
+.hero-shell{
+  overflow:visible;
+  padding:28px 0;
+  background:transparent;
+  border:none;
+  box-shadow:none;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+.hero-shell::before{
+  inset:-24px -28px -36px -28px;
+  background:
+    radial-gradient(circle at 10% 6%, rgba(255,255,255,.88), transparent 24%),
+    radial-gradient(circle at 84% 12%, rgba(91,141,184,.14), transparent 26%),
+    radial-gradient(circle at 78% 80%, rgba(74,140,111,.10), transparent 20%);
+  filter:blur(8px);
+}
+.hero-grid{gap:38px;align-items:center;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);}
+.hero-copy{justify-content:flex-start;max-width:none;}
+.hero-preview{display:flex;flex-direction:column;align-items:flex-start;}
+.hero-kicker,
+.showcase-eyebrow,
+.metric-label,
+.preview-kicker,
+.phase-nav-kicker,
+.phase-header-copy .overline{
+  font-size:0.6875rem !important;
+  font-weight:700 !important;
+  letter-spacing:.1em !important;
+  text-transform:uppercase !important;
+  color:var(--ui-kicker) !important;
+}
+.hero-title{
+  font-size:clamp(40px,6vw,78px);
+  line-height:.94;
+  max-width:11ch;
+}
+.hero-sub{
+  max-width:60ch;
+  color:var(--ui-text) !important;
+}
+.hero-actions{margin-top:26px;}
+.hero-meta{margin-top:18px;gap:12px;}
+.hero-badge{
+  display:inline-flex;
+  align-items:center;
+  min-height:38px;
+  padding:0 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(17,24,39,.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.86);
+  color:#344054;
+  font-size:0.75rem;
+  font-weight:700;
+}
+.hero-preview{display:flex;align-items:center;}
+.preview-frame{padding:20px;}
+.preview-top{margin-bottom:18px;}
+.preview-kicker strong{display:block;color:#111827;font-size:0.875rem;letter-spacing:0;text-transform:none;margin-top:4px;}
+.preview-panel{gap:14px;}
+.preview-card,
+.preview-mini{
+  background:rgba(255,255,255,.74);
+  border:1px solid var(--ui-stroke);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.82);
+}
+.preview-card{border-radius:22px;padding:16px 16px 14px;}
+.preview-mini{border-radius:20px;padding:13px;}
+.preview-card h3{font-size:0.9375rem;line-height:1.35;}
+.preview-tag,
+.phase-chip,
+.phase-nav-status,
+.tab-badge{
+  background:#f8fafc;
+  border:1px solid rgba(17,24,39,.08);
+  color:#475467;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+.showcase-shell{gap:22px;}
+.showcase-card,
+.metric-card{
+  overflow:hidden;
+  transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.showcase-card:hover,
+.metric-card:hover,
+.phase-section:hover,
+.preview-frame:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--ui-card-shadow-hover);
+}
+.summary-apple{
+  padding:24px 28px;
+}
+.summary-apple-line span{
+  background:linear-gradient(180deg, #101828 0%, #344054 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+}
+.metrics-grid{gap:18px;}
+.metric-card{
+  min-height:176px;
+  padding:22px !important;
+  justify-content:space-between;
+}
+.metric-card::before{
+  inset:0 0 auto 0;
+  height:54px;
+  background:linear-gradient(180deg, rgba(91,141,184,.08), rgba(91,141,184,0));
+  border-radius:24px 24px 0 0;
+}
+.metric-label{margin-bottom:14px !important;}
+.metric-value{font-size:2.375rem !important;letter-spacing:-.04em;}
+.metric-sub{font-size:0.7812rem;line-height:1.6;color:var(--ui-text) !important;}
+
+.tabs-wrap{margin-bottom:26px;}
+.tabs-list{
+  padding:12px;
+  gap:12px;
+  background:linear-gradient(180deg, rgba(255,255,255,.84), rgba(249,250,251,.76));
+}
+.nav-tab{
+  min-height:48px;
+  padding:0 18px;
+  border-radius:14px;
+  font-weight:700;
+  color:#667085;
+}
+.nav-tab:hover{
+  background:rgba(255,255,255,.9);
+  color:#111827;
+  box-shadow:0 8px 18px rgba(15,23,42,.05);
+}
+.nav-tab.active{
+  background:#ffffff;
+  color:#1d4ed8;
+  box-shadow:0 10px 22px rgba(15,23,42,.06), inset 0 1px 0 rgba(255,255,255,.92);
+}
+.nav-tab.active .tab-badge{
+  background:#eef4ff;
+  color:#1d4ed8;
+  border-color:rgba(29,78,216,.14);
+}
+
+.apple-phase-nav{
+  max-width:920px;
+  margin:22px auto 18px;
+  padding:14px;
+}
+.phase-nav-meta{align-items:center;}
+.phase-progress-track{height:12px;}
+.phase-progress-line{
+  width:100%;
+  background:#e7edf5;
+}
+.phase-progress-fill{
+  background:linear-gradient(90deg, var(--phase1), var(--phase3));
+  box-shadow:0 0 0 1px rgba(255,255,255,.32);
+}
+.phase-nav-pill{
+  min-height:58px;
+  padding:10px 14px;
+  border-radius:18px;
+  background:rgba(255,255,255,.58);
+  border:1px solid rgba(17,24,39,.08);
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+.phase-nav-pill:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(15,23,42,.06);}
+.phase-nav-pill.active{
+  background:#fff;
+  border-color:rgba(17,24,39,.1);
+  box-shadow:0 12px 22px rgba(15,23,42,.06), inset 0 1px 0 rgba(255,255,255,.92);
+}
+.phase-pill-step{
+  color:#98a2b3;
+  font-weight:800;
+}
+.phase-nav-pill.active .phase-pill-step{color:#1d4ed8;}
+.phase-pill-copy strong{font-size:0.8125rem;}
+.phase-pill-copy small{font-size:0.6875rem;color:#667085;}
+.phase-nav-btn{
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(17,24,39,.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.86);
+}
+
+.phase-section{
+  display:none;
+  overflow:hidden;
+  padding:0;
+  margin-bottom:18px;
+}
+.phase-section.active-slide{display:block;}
+.phase-header{
+  padding:22px 24px 18px;
+  border-bottom:1px solid rgba(17,24,39,.06);
+}
+.phase-header-main{gap:16px;}
+.phase-step{
+  width:40px;
+  height:40px;
+  box-shadow:0 10px 18px rgba(15,23,42,.12);
+}
+.phase-header-copy h3{font-size:1.375rem;line-height:1.18;margin-bottom:6px;}
+.phase-header-copy p,
+.phase-body-top p,
+.phase-progress,
+.phase-note,
+.phase-open-label{color:var(--ui-text) !important;}
+.phase-chip{min-height:32px;padding:0 12px;font-size:0.6875rem;}
+.phase-body{padding:18px 24px 24px;}
+.phase-body-top{margin-bottom:18px;}
+.quadrant-grid{gap:18px;}
+.phase-quadrant{
+  min-height:270px;
+  border-radius:22px !important;
+  background:rgba(255,255,255,.7);
+  border:1px solid rgba(17,24,39,.08) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.86), 0 8px 20px rgba(15,23,42,.03) !important;
+}
+.phase-quadrant:hover,
+.phase-quadrant:focus-visible{
+  transform:translateY(-2px);
+  box-shadow:0 16px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.9) !important;
+}
+.quadrant-status{
+  background:#f8fafc;
+  border:1px solid rgba(17,24,39,.08);
+  color:#667085;
+}
+.phase-actions{
+  margin-top:auto;
+  padding-top:14px;
+  border-top:1px solid rgba(17,24,39,.06);
+}
+
+.panel-intro,
+.showcase-copy,
+.step-copy,
+.signal-label,
+.signal-value,
+.msg-text,
+.m-desc,
+.prompt-q,
+.status-body,
+.status-tip,
+.how-box p,
+.cell-body{color:var(--ui-text) !important;}
+
+body.hc .showcase-card,
+body.hc .summary-apple,
+body.hc .metric-card,
+body.hc .tabs-list,
+body.hc .apple-phase-nav,
+body.hc .phase-section,
+body.hc .preview-frame{
+  background:var(--surface) !important;
+  border-color:var(--border) !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+body.hc .hero-badge,
+body.hc .nav-tab,
+body.hc .phase-nav-pill,
+body.hc .phase-nav-btn,
+body.hc .phase-chip,
+body.hc .preview-tag,
+body.hc .tab-badge,
+body.hc .preview-card,
+body.hc .preview-mini,
+body.hc .phase-quadrant{
+  background:#17191c !important;
+  border-color:var(--border) !important;
+  color:var(--dark) !important;
+  box-shadow:none !important;
+}
+body.hc .nav-tab.active,
+body.hc .phase-nav-pill.active{
+  background:#f5f7fa !important;
+  color:#0a0a0a !important;
+}
+body.hc .phase-progress-line{background:#20242a !important;}
+body.hc .phase-progress-fill{background:#f5f7fa !important;}
+
+@media(max-width:900px){
+  .hero-shell{padding:22px 20px;}
+  .hero-grid{gap:26px;}
+  .metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .apple-phase-nav{max-width:none;}
+}
+@media(max-width:680px){
+  .hero-shell,
+  .summary-apple,
+  .preview-frame,
+  .apple-phase-nav,
+  .phase-section,
+  .showcase-card,
+  .metric-card,
+  .tabs-list{border-radius:22px !important;}
+  .hero-shell{padding:18px 16px;}
+  .preview-grid{grid-template-columns:1fr;}
+  .preview-frame{padding:18px;}
+  .tabs-list{gap:8px;padding:10px;}
+  .nav-tab{min-height:42px;padding:0 14px;font-size:0.8125rem;}
+  .metric-card{padding:18px !important;}
+  .phase-header{padding:18px 18px 16px;}
+  .phase-body{padding:16px 18px 18px;}
+  .quadrant-grid{grid-template-columns:1fr;}
+}
+
+
+/* ==================================================
+   END OF STYLESHEET
+================================================== */
+</style>
+
+<!-- ==================================================
+  "SECTION 11 · EXTERNAL SCRIPT DEPENDENCY"
+================================================== -->
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<!-- ==================================================
+  "SECTION 04 · BODY START"
+================================================== -->
+<a href="#main" class="skip-link">Skip to main content</a>
+
+
+<!-- ==================================================
+  "SECTION 05 · ACCESSIBILITY TOOLBAR"
+================================================== -->
+<div class="a11y-bar" role="toolbar" aria-label="Accessibility options">
+  <button class="a11y-btn" id="font-down" aria-label="Decrease font size">A−</button>
+  <button class="a11y-btn" id="font-up" aria-label="Increase font size">A+</button>
+  <button class="a11y-btn" id="hc-btn" aria-pressed="false" aria-label="Toggle high contrast">◑</button>
+</div>
+
+
+<!-- ==================================================
+  "SECTION 06 · HERO / LANDING HEADER"
+================================================== -->
+<header class="site-header" role="banner">
+  <div class="hero-shell">
+    <div class="hero-grid">
+      <section class="hero-copy">
+        <p class="hero-sub"><strong>Welcome back, Alex. 👋</strong><br>We're glad you're here. This onboarding experience introduces the return journey first, so the toolkit feels supportive before it feels task-oriented.</p>
+        <div class="hero-actions">
+          <button class="header-chip" id="open-welcome-modal" type="button">Open guided onboarding</button>
+          <a class="chip-btn secondary" href="#main">Explore the toolkit</a>
+        </div>
+      </section>
+      <aside class="hero-preview" aria-label="Product visual">
+        <img src="hero.png" alt="" class="hero-title" style="width:100%;max-width:480px;height:auto;display:block;background:none;-webkit-background-clip:initial;background-clip:initial;object-fit:contain;">
+      </aside>
+    </div>
+  </div>
+</header>
+
+
+<!-- ==================================================
+  "SECTION 07 · GUIDED ONBOARDING MODAL"
+================================================== -->
+<div class="modal-overlay" id="welcome-modal" aria-hidden="true">
+  <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="phase-title" aria-describedby="phase-copy">
+    <div class="modal-topbar">
+      <div class="modal-kicker">Return journey overview</div>
+      <button class="modal-close" id="close-welcome-modal" type="button" aria-label="Close welcome overview">×</button>
+    </div>
+    <div class="welcome-card" style="margin:0;padding:0;border:none;background:transparent;box-shadow:none">
+      <div class="onboard-shell">
+        <div class="onboard-progress" aria-label="Onboarding progress">
+          <span class="onboard-pill active" data-onboard-pill="1">1</span>
+          <span class="onboard-progress-line" id="onboard-line-1" style="--fill:0"></span>
+          <span class="onboard-pill" data-onboard-pill="2">2</span>
+          <span class="onboard-progress-line" id="onboard-line-2" style="--fill:0"></span>
+          <span class="onboard-pill" data-onboard-pill="3">3</span>
+        </div>
+
+        <section class="onboard-step active" data-onboard-step="1">
+          <div class="onboard-layout">
+            <div class="onboard-panel">
+              <div class="modal-kicker">Step 1 · Welcome</div>
+              <h1 class="onboard-title">Welcome back, <em>Alex.</em> 👋</h1>
+              <p class="onboard-copy">We’re glad you’re here. This onboarding experience introduces the return journey first, so the toolkit feels supportive before it feels task-oriented.</p>
+              <div class="onboard-mini">🤝 Assigned peer: <strong>Priya</strong></div>
+              <div class="onboard-grid-2">
+                <div class="onboard-feature">
+                  <h3>What this is</h3>
+                  <p>A guided employee-facing reintegration experience for people returning after extended leave.</p>
+                </div>
+                <div class="onboard-feature">
+                  <h3>What happens next</h3>
+                  <p>You’ll see the three phases, how support is structured, and where to begin first.</p>
+                </div>
+              </div>
+            </div>
+            <aside class="onboard-card-stack">
+              <div class="onboard-sidecard">
+                <h3>Designed for a gentle re-entry</h3>
+                <p>Instead of throwing everything at the user at once, the experience starts with orientation, clarity, and emotional safety.</p>
+              </div>
+              <div class="onboard-sidecard">
+                <h3>Current journey status</h3>
+                <p id="journey-status">Open the first phase quadrants or write a reflection to begin tracking progress.</p>
+                <p class="status-tip" id="journey-tip" style="margin-top:8px">Tip: your notes and onboarding state are saved automatically on this device.</p>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="onboard-step" data-onboard-step="2">
+          <div class="onboard-panel">
+            <div class="modal-kicker">Step 2 · How the toolkit works</div>
+            <h2 class="onboard-title" style="font-size:30px">Three phases, four support quadrants</h2>
+            <p class="onboard-copy">The system is organized as a staged journey. Each phase has four support dimensions — Knowledge, Tasks, Confidence, and Connection — so the returner is supported operationally and emotionally at the same time.</p>
+            <div class="onboard-phase-row">
+              <div class="onboard-phase-card">
+                <div class="onboard-phase-badge" style="background:#EBF3FA;color:var(--phase1)">● Phase 1</div>
+                <h3>Orient</h3>
+                <p>Reduce ambiguity, explain what changed, and lower the pressure to perform immediately.</p>
+              </div>
+              <div class="onboard-phase-card">
+                <div class="onboard-phase-badge" style="background:#FCE9DD;color:var(--phase2)">● Phase 2</div>
+                <h3>Rebuild</h3>
+                <p>Create manageable wins, rebuild rhythm, and generate visible evidence of competence.</p>
+              </div>
+              <div class="onboard-phase-card">
+                <div class="onboard-phase-badge" style="background:#EEF7F2;color:var(--phase3)">● Phase 3</div>
+                <h3>Own</h3>
+                <p>Shift from catching up to contributing forward and eventually supporting the next returner.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="onboard-step" data-onboard-step="3">
+          <div class="onboard-layout">
+            <div class="onboard-panel">
+              <div class="modal-kicker">Step 3 · Get started</div>
+              <h2 id="phase-title" class="onboard-title" style="font-size:30px">You're in Phase 1: Orient</h2>
+              <p id="phase-copy" class="onboard-copy">This week is about absorbing, not delivering. Your only job is to get your bearings — the toolkit will guide you through the rest. You are not expected to have all the answers yet.</p>
+              <div class="phase-badges" aria-label="Your journey phases">
+                <span class="pbadge active" data-phase-badge="1" aria-current="step">● Phase 1: Orient — Week 1</span>
+                <span class="pbadge up" data-phase-badge="2">○ Phase 2: Rebuild</span>
+                <span class="pbadge up" data-phase-badge="3">○ Phase 3: Own</span>
+              </div>
+              <div class="onboard-highlight" style="margin-top:18px">
+                <h3>Recommended first action</h3>
+                <p>Start by exploring the four quadrants inside Phase 1. Completing that first phase will unlock the next section automatically.</p>
+                <div class="onboard-checklist">
+                  <div class="onboard-check"><span class="onboard-check-dot">1</span><span><strong>Open Phase 1</strong> and review all four quadrants.</span></div>
+                  <div class="onboard-check"><span class="onboard-check-dot">2</span><span><strong>Write one reflection</strong> to capture a fear, win, or competent moment.</span></div>
+                  <div class="onboard-check"><span class="onboard-check-dot">3</span><span><strong>Use the dashboard</strong> to show support signals rather than surveillance.</span></div>
+                </div>
+              </div>
+            </div>
+            <aside class="onboard-card-stack">
+              <div class="onboard-sidecard">
+                <h3>Current phase summary</h3>
+                <p id="onboard-phase-status">You are in the early re-entry stage. Focus on understanding changes and lowering pressure.</p>
+              </div>
+              <div class="onboard-sidecard onboarding-progress-card">
+                <div class="onboard-progress-head">
+                  <h3>Progress check-in</h3>
+                  <p class="status-tip" id="onboard-progress-tip">Only shown here to reduce pressure on the homepage.</p>
+                </div>
+                <div class="prog-widget onboard-prog-widget" aria-label="Reintegration progress">
+                  <div class="prog-label">Progress</div>
+                  <div class="prog-wrap">
+                    <svg width="68" height="68" viewBox="0 0 68 68" aria-hidden="true">
+                      <circle class="ring-bg" cx="34" cy="34" r="27"/>
+                      <circle class="ring-fill" id="ring" cx="34" cy="34" r="27"/>
+                    </svg>
+                    <div class="ring-num" id="ring-num" aria-hidden="true">0%</div>
+                  </div>
+                  <div class="prog-label" id="week-label">Week 1 of 3</div>
+                  <div class="progress-strip" aria-hidden="true"><div class="progress-strip-fill" id="progress-strip-fill"></div></div>
+                </div>
+                <p><strong id="onboard-progress-count">0%</strong> total progress</p>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <div class="onboard-actions">
+          <div class="onboard-actions-left">
+            <button class="modal-secondary onboard-ghost" id="onboard-back" type="button">Back</button>
+            <button class="modal-secondary" id="onboard-skip" type="button">Skip onboarding</button>
+          </div>
+          <div class="onboard-actions-right">
+            <button class="modal-secondary" id="welcome-jump-reflection" type="button">Go to reflections</button>
+            <button class="modal-primary" id="onboard-next" type="button">Next</button>
+            <button class="modal-primary" id="welcome-start" type="button" style="display:none">Enter toolkit</button>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+
+<!-- ==================================================
+  "SECTION 08 · PORTFOLIO STORY / JOURNEY OVERVIEW"
+================================================== -->
+<div class="showcase-shell">
+
+
+
+
+</div>
+
+
+<!-- ==================================================
+  "SECTION 09 · MAIN TOOLKIT APPLICATION"
+================================================== -->
+<main id="main">
+  
+  <!-- ===== 09A · Primary tab navigation ===== -->
+  <div class="tabs-wrap">
+    <ul class="tabs-list" role="tablist" aria-label="Toolkit sections">
+      <li role="presentation"><button class="nav-tab active" role="tab" aria-selected="true" id="t-matrix" aria-controls="p-matrix" data-tab="matrix"><i data-lucide="layout-grid"></i> Toolkit Matrix</button></li>
+      <li role="presentation"><button class="nav-tab" role="tab" aria-selected="false" id="t-peer" aria-controls="p-peer" data-tab="peer"><i data-lucide="message-circle"></i> Peer Encouragement</button></li>
+      <li role="presentation"><button class="nav-tab" role="tab" aria-selected="false" id="t-mile" aria-controls="p-mile" data-tab="mile"><i data-lucide="medal"></i> Milestone Moments</button></li>
+      <li role="presentation"><button class="nav-tab" role="tab" aria-selected="false" id="t-refl" aria-controls="p-refl" data-tab="refl"><i data-lucide="pencil-line"></i> Reflection Prompts</button></li>
+      <li role="presentation"><button class="nav-tab" role="tab" aria-selected="false" id="t-dash" aria-controls="p-dash" data-tab="dash"><i data-lucide="bar-chart-3"></i> Manager Dashboard</button></li>
+      <li role="presentation"><button class="nav-tab" role="tab" aria-selected="false" id="t-about" aria-controls="p-about" data-tab="about"><i data-lucide="info"></i> About Us</button></li>
+    </ul>
+  </div>
+
+  
+  <!-- ===== 09B · Tab panel: Toolkit Matrix ===== -->
+  <div class="tab-panel active" id="p-matrix" role="tabpanel" aria-labelledby="t-matrix">
+    <div class="pal-banner">
+      <span class="pal-banner-label">Your Task Pal</span>
+      <span class="pal-banner-name">Priya</span>
+      <span class="pal-banner-sep">·</span>
+      <span class="pal-banner-help">Need any help? <a href="mailto:" class="pal-banner-link">Contact her</a></span>
+      <span class="pal-banner-sep" aria-hidden="true">·</span>
+      <span class="pal-banner-legend" aria-label="Colour key">
+        <span class="dim-dot"><span class="dot" style="background:var(--knowledge)"></span>Knowledge</span>
+        <span class="dim-dot"><span class="dot" style="background:var(--tasks)"></span>Tasks</span>
+        <span class="dim-dot"><span class="dot" style="background:var(--confidence)"></span>Confidence</span>
+        <span class="dim-dot"><span class="dot" style="background:var(--connection)"></span>Connection</span>
+      </span>
+    </div>
+    <p class="panel-intro">The toolkit is now organized as a staged journey. Each phase opens as its own section, and every phase contains four support quadrants: Knowledge, Tasks, Confidence, and Connection. Complete one phase to unlock and expand the next.</p>
+    
+    <div class="phase-carousel-nav apple-phase-nav" aria-label="Phase navigation">
+      <button class="phase-nav-btn phase-nav-arrow" type="button" id="phase-prev" aria-label="Previous phase">
+        <span aria-hidden="true">←</span>
+      </button>
+
+      <div class="phase-nav-center">
+        <div class="phase-nav-meta">
+          <span class="phase-nav-kicker">Structured return journey</span>
+          <span class="phase-nav-status" id="phase-nav-status">Phase 1 of 3 · Orient</span>
+        </div>
+
+        <div class="phase-progress-track" aria-hidden="true">
+          <span class="phase-progress-line"></span>
+          <span class="phase-progress-fill" id="phase-progress-fill"></span>
+        </div>
+
+        <div class="phase-nav-pills" role="tablist" aria-label="Phase switcher">
+          <button class="phase-nav-pill active" type="button" data-phase-jump="1" role="tab" aria-selected="true">
+            <span class="phase-pill-step">01</span>
+            <span class="phase-pill-copy">
+              <strong>Orient</strong>
+              <small>Reduce ambiguity</small>
+            </span>
+          </button>
+          <button class="phase-nav-pill" type="button" data-phase-jump="2" role="tab" aria-selected="false">
+            <span class="phase-pill-step">02</span>
+            <span class="phase-pill-copy">
+              <strong>Rebuild</strong>
+              <small>Create small wins</small>
+            </span>
+          </button>
+          <button class="phase-nav-pill" type="button" data-phase-jump="3" role="tab" aria-selected="false">
+            <span class="phase-pill-step">03</span>
+            <span class="phase-pill-copy">
+              <strong>Own</strong>
+              <small>Move into contribution</small>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <button class="phase-nav-btn phase-nav-arrow" type="button" id="phase-next" aria-label="Next phase">
+        <span aria-hidden="true">→</span>
+      </button>
+    </div>
+
+    <div class="phase-flow" id="phase-flow">
+      <section class="phase-section" data-phase="1">
+        <div class="phase-header">
+          <div class="phase-header-main">
+            <div class="phase-step phase-1">1</div>
+            <div class="phase-header-copy">
+              <h3>Phase 1: Orient</h3>
+              <p>Reduce ambiguity first. This phase helps the returner understand what changed and lowers the pressure to perform immediately.</p>
+            </div>
+          </div>
+          <div class="phase-header-meta">
+            <span class="phase-chip" id="phase-chip-1">Unlocked</span>
+            <span class="phase-chip" id="phase-progress-1">0 / 4 explored</span>
+            <button class="phase-toggle-btn" type="button" data-phase-toggle="1" aria-expanded="true" aria-label="Toggle Phase 1">▾</button>
+          </div>
+        </div>
+        <div class="phase-body" id="phase-body-1">
+          <div class="quadrant-grid">
+            <article class="matrix-cell phase-quadrant" tabindex="0" data-cell="phase1-knowledge" data-dimension="knowledge" data-phase-index="1">
+              <div class="quadrant-kicker"><div class="quadrant-label"><span class="dot" style="background:var(--knowledge)"></span>Knowledge</div><span class="quadrant-status">Not explored</span></div>
+              <div class="cell-title" style="color:var(--knowledge)">Curated change log</div>
+              <div class="cell-body">A clear summary of changes while the employee was away, so they can understand the landscape without being flooded.</div>
+              <div class="cell-detail"><ul><li>Manager prepares a short “what changed” brief by theme.</li><li>Peer walkthrough highlights org, tool, and workflow shifts.</li><li>Shared doc captures “things I wish I’d known.”</li></ul><div class="cell-addr">Addresses: “I don’t know what I don’t know.”</div></div>
+              <div class="phase-actions"><span class="phase-note">Orientation support</span><span class="phase-open-label">Click to mark explored</span></div>
+            </article>
+            <article class="matrix-cell phase-quadrant" tabindex="0" data-cell="phase1-tasks" data-dimension="tasks" data-phase-index="1">
+              <div class="quadrant-kicker"><div class="quadrant-label"><span class="dot" style="background:var(--tasks)"></span>Tasks</div><span class="quadrant-status">Not explored</span></div>
+              <div class="cell-title" style="color:var(--tasks)">Workload landscape</div>
+              <div class="cell-body">The employee sees what is active without being expected to own it yet, so visibility comes before responsibility.</div>
+              <div class="cell-detail"><ul><li>Provide a read-only view of active projects.</li><li>Invite the returner to attend standups as a listener.</li><li>Explicitly state that week one is not for delivery.</li></ul><div class="cell-addr">Addresses: “I’m overwhelmed before I even start.”</div></div>
+              <div class="phase-actions"><span class="phase-note">Low-pressure entry</span><span class="phase-open-label">Click to mark explored</span></div>
+            </article>
+            <article class="matrix-cell phase-quadrant" tabindex="0" data-cell="phase1-confidence" data-dimension="confidence" data-phase-index="1">
+              <div class="quadrant-kicker"><div class="quadrant-label"><span class="dot" style="background:var(--confidence)"></span>Confidence</div><span class="quadrant-status">Not explored</span></div>
+              <div class="cell-title" style="color:var(--confidence)">Imposter syndrome check-in</div>
+              <div class="cell-body">Confidence starts with naming the fear directly and normalizing it before the employee feels they must prove themselves.</div>
+              <div class="cell-detail"><ul><li>Pre-return conversation says it is normal to feel behind.</li><li>Share anonymized stories from other returners.</li><li>Offer a short prompt: “What am I afraid of, and what is actually true?”</li></ul><div class="cell-addr">Addresses: “They’ve moved on without me.”</div></div>
+              <div class="phase-actions"><span class="phase-note">Psychological safety</span><span class="phase-open-label">Click to mark explored</span></div>
+            </article>
+            <article class="matrix-cell phase-quadrant" tabindex="0" data-cell="phase1-connection" data-dimension="connection" data-phase-index="1">
+              <div class="quadrant-kicker"><div class="quadrant-label"><span class="dot" style="background:var(--connection)"></span>Connection</div><span class="quadrant-status">Not explored</span></div>
+              <div class="cell-title" style="color:var(--connection)">Social re-entry rituals</div>
+              <div class="cell-body">The employee is reintroduced through human rituals rather than big announcements, so belonging begins to return gently.</div>
+              <div class="cell-detail"><ul><li>Assigned peer checks in daily during the first week.</li><li>Low-key welcome with key collaborators.</li><li>1-on-1 reconnection chats have no agenda beyond relationship repair.</li></ul><div class="cell-addr">Addresses: “I don’t recognize this team anymore.”</div></div>
+              <div class="phase-actions"><span class="phase-note">Reconnection</span><span class="phase-open-label">Click to mark explored</span></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="phase-section" data-phase="2">
+        <div class="phase-header">
+          <div class="phase-header-main">
+            <div class="phase-step phase-2">2</div>
+            <div class="phase-header-copy">
+              <h3>Phase 2: Rebuild</h3>
+              <p>Once the first phase is complete, the toolkit shifts into momentum. This phase rebuilds capability through small wins, practice, and support.</p>
+            </div>
+          </div>
+          <div class="phase-header-meta">
+            <span class="phase-chip locked" id="phase-chip-2">Locked</span>
+            <span class="phase-chip" id="phase-progress-2">0 / 4 explored</span>
+            <button class="phase-toggle-btn" type="button" data-phase-toggle="2" aria-expanded="false" aria-label="Toggle Phase 2">▾</button>
+          </div>
+        </div>
+        <div class="phase-body" id="phase-body-2">
+          <div class="quadrant-grid">
+            <article class="matrix-cell phase-quadrant" tabindex="0" data-cell="phase2-knowledge" data-dimension="knowledge" data-phase-index="2">
+              <div class="quadrant-kicker"><div class="quadrant-label"><span class="dot" style="background:var(--knowledge)"></span>Knowledge</div><span class="quadrant-status">Not explored</span></div>
+              <div class="cell-title" style="color:var(--knowledge)">Low-pressure learning</div>
+              <div class="cell-body">The employee fills skill and process gaps through self-paced learning rather than being tested on what they missed.</div>
+              <div class="cell-detail"><ul><li>Short walkthrough videos explain new tools.</li><li>Shadow a colleague for a half-day.</li><li>Create a manager-returner gap map to prioritize what matters most.</li></ul><div class="cell-addr">Addresses: “Everyone knows this except me.”</div></div>
+              <div class="phase-actions"><span class="phase-note">Rebuild understanding</span><span class="phase-open-label">Click to mark explored</span></div>
+            </article>
+            <article class="matrix-cell phase-quadrant" tabindex="0" data-cell="phase2-tasks" data-dimension="tasks" data-phase-index="2">
+              <div class="quadrant-kicker"><div class="quadrant-label"><span class="dot" style="background:var(--tasks)"></span>Tasks</div><span class="quadrant-status">Not explored</span></div>
+              <div class="cell-title" style="color:var(--tasks)">Graduated task ramp</div>
+              <div class="cell-body">Task complexity increases gradually so that momentum builds before high-stakes ownership returns.</div>
+              <div class="cell-detail"><ul><li>First tasks can be completed in 1–2 hours.</li><li>Pair on a medium task before solo ownership.</li><li>Weekly load check-ins protect against overload.</li></ul><div class="cell-addr">Addresses: “I used to be able to do this easily.”</div></div>
+              <div class="phase-actions"><span class="phase-note">Progressive workload</span><span class="phase-open-label">Click to mark explored</span></div>
+            </article>
+            <article class="matrix-cell phase-quadrant" tabindex="0" data-cell="phase2-confidence" data-dimension="confidence" data-phase-index="2">
+              <div class="quadrant-kicker"><div class="quadrant-label"><span class="dot" style="background:var(--confidence)"></span>Confidence</div><span class="quadrant-status">Not explored</span></div>
+              <div class="cell-title" style="color:var(--confidence)">Quick wins by design</div>
+              <div class="cell-body">Confidence grows through visible evidence. The system intentionally creates success conditions rather than waiting for them by chance.</div>
+              <div class="cell-detail"><ul><li>Assign one task set up for likely success.</li><li>Track small wins in a private log.</li><li>Use check-ins to ask where competence showed up.</li></ul><div class="cell-addr">Addresses: “I can’t do this anymore.”</div></div>
+              <div class="phase-actions"><span class="phase-note">Visible competence</span><span class="phase-open-label">Click to mark explored</span></div>
+            </article>
+            <article class="matrix-cell phase-quadrant" tabindex="0" data-cell="phase2-connection" data-dimension="connection" data-phase-index="2">
+              <div class="quadrant-kicker"><div class="quadrant-label"><span class="dot" style="background:var(--connection)"></span>Connection</div><span class="quadrant-status">Not explored</span></div>
+              <div class="cell-title" style="color:var(--connection)">Relationship rebuilding</div>
+              <div class="cell-body">Belonging deepens through collaboration, shared work, and being invited back into the social and operational fabric.</div>
+              <div class="cell-detail"><ul><li>Invite the employee into cross-functional conversations again.</li><li>Pair on collaborative tasks that rebuild trust through doing.</li><li>Managers actively create space for their voice in meetings.</li></ul><div class="cell-addr">Addresses: “I feel like a guest in my own team.”</div></div>
+              <div class="phase-actions"><span class="phase-note">Belonging through work</span><span class="phase-open-label">Click to mark explored</span></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="phase-section" data-phase="3">
+        <div class="phase-header">
+          <div class="phase-header-main">
+            <div class="phase-step phase-3">3</div>
+            <div class="phase-header-copy">
+              <h3>Phase 3: Own</h3>
+              <p>The final phase turns reintegration into forward contribution. The employee is no longer just catching up; they are shaping what comes next.</p>
+            </div>
+          </div>
+          <div class="phase-header-meta">
+            <span class="phase-chip locked" id="phase-chip-3">Locked</span>
+            <span class="phase-chip" id="phase-progress-3">0 / 4 explored</span>
+            <button class="phase-toggle-btn" type="button" data-phase-toggle="3" aria-expanded="false" aria-label="Toggle Phase 3">▾</button>
+          </div>
+        </div>
+        <div class="phase-body" id="phase-body-3">
+          <div class="quadrant-grid">
+            <article class="matrix-cell phase-quadrant" tabindex="0" data-cell="phase3-knowledge" data-dimension="knowledge" data-phase-index="3">
+              <div class="quadrant-kicker"><div class="quadrant-label"><span class="dot" style="background:var(--knowledge)"></span>Knowledge</div><span class="quadrant-status">Not explored</span></div>
+              <div class="cell-title" style="color:var(--knowledge)">Knowledge sharing</div>
+              <div class="cell-body">Fresh eyes become an asset. The employee documents what others overlook and helps improve the system for future use.</div>
+              <div class="cell-detail"><ul><li>Document a process from a newcomer’s perspective.</li><li>Share one learning from leave that benefits the team.</li><li>Point out normalized inefficiencies others no longer notice.</li></ul><div class="cell-addr">Addresses: “I have nothing to offer anymore.”</div></div>
+              <div class="phase-actions"><span class="phase-note">Contribution through insight</span><span class="phase-open-label">Click to mark explored</span></div>
+            </article>
+            <article class="matrix-cell phase-quadrant" tabindex="0" data-cell="phase3-tasks" data-dimension="tasks" data-phase-index="3">
+              <div class="quadrant-kicker"><div class="quadrant-label"><span class="dot" style="background:var(--tasks)"></span>Tasks</div><span class="quadrant-status">Not explored</span></div>
+              <div class="cell-title" style="color:var(--tasks)">Full ownership</div>
+              <div class="cell-body">The employee now leads meaningful work and sets direction rather than simply absorbing tasks handed to them.</div>
+              <div class="cell-detail"><ul><li>Take end-to-end ownership of a collaboratively chosen workstream.</li><li>Set sprint goals and timelines with autonomy.</li><li>Review the reintegration ramp and identify what can improve.</li></ul><div class="cell-addr">Addresses: “Am I really back, or just filling a seat?”</div></div>
+              <div class="phase-actions"><span class="phase-note">Contribution ownership</span><span class="phase-open-label">Click to mark explored</span></div>
+            </article>
+            <article class="matrix-cell phase-quadrant" tabindex="0" data-cell="phase3-confidence" data-dimension="confidence" data-phase-index="3">
+              <div class="quadrant-kicker"><div class="quadrant-label"><span class="dot" style="background:var(--confidence)"></span>Confidence</div><span class="quadrant-status">Not explored</span></div>
+              <div class="cell-title" style="color:var(--confidence)">Growth identity</div>
+              <div class="cell-body">The return narrative shifts from catching up to growing forward. Leave becomes part of the employee’s strength story.</div>
+              <div class="cell-detail"><ul><li>Reflect on skills the leave experience developed.</li><li>Set one 90-day future-facing growth goal.</li><li>Name how the return journey changed professional identity.</li></ul><div class="cell-addr">Addresses: “I lost time I can never get back.”</div></div>
+              <div class="phase-actions"><span class="phase-note">Forward identity</span><span class="phase-open-label">Click to mark explored</span></div>
+            </article>
+            <article class="matrix-cell phase-quadrant" tabindex="0" data-cell="phase3-connection" data-dimension="connection" data-phase-index="3">
+              <div class="quadrant-kicker"><div class="quadrant-label"><span class="dot" style="background:var(--connection)"></span>Connection</div><span class="quadrant-status">Not explored</span></div>
+              <div class="cell-title" style="color:var(--connection)">Community of practice</div>
+              <div class="cell-body">Support becomes collective. The employee can now help sustain a community that supports future returners too.</div>
+              <div class="cell-detail"><ul><li>Join or create a returners’ peer circle.</li><li>Contribute to improving the reintegration toolkit itself.</li><li>Mentor or welcome the next person coming back from leave.</li></ul><div class="cell-addr">Addresses: “Nobody understands what this is like.”</div></div>
+              <div class="phase-actions"><span class="phase-note">Shared infrastructure</span><span class="phase-open-label">Click to mark explored</span></div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  
+  <!-- ===== 09C · Tab panel: Peer Encouragement ===== -->
+  <div class="tab-panel" id="p-peer" role="tabpanel" aria-labelledby="t-peer">
+    <p class="panel-intro">A shared wall where teammates leave specific, genuine notes. Not “great job!” — real observations that help you see yourself clearly. Notes are delivered privately; you choose whether to save them.</p>
+    <div class="msg-list" aria-label="Peer messages">
+      <article class="msg-card" style="border-left-color:var(--knowledge)"><div class="avatar" style="background:var(--knowledge)" aria-hidden="true">P</div><div><div class="msg-meta"><strong>From: Priya</strong> (your colleague)</div><p class="msg-text">"You asked about the new deploy pipeline in standup today and I realized half the team didn't fully understand it either. Your question made it better for everyone."</p><div class="msg-week">Day 3 of return</div></div></article>
+      <article class="msg-card" style="border-left-color:var(--tasks)"><div class="avatar" style="background:var(--tasks)" aria-hidden="true">M</div><div><div class="msg-meta"><strong>From: Marcus</strong> (team lead)</div><p class="msg-text">"I noticed you jumped into the code review for the auth module already. That takes confidence after being away. And your feedback caught something we all missed."</p><div class="msg-week">Week 2 of return</div></div></article>
+      <article class="msg-card" style="border-left-color:var(--confidence)"><div class="avatar" style="background:var(--confidence)" aria-hidden="true">A</div><div><div class="msg-meta"><strong>From: Aisha</strong> (PM)</div><p class="msg-text">"In the retro today, you brought up the user feedback gap — that's the kind of perspective we were missing while you were gone. Fresh eyes are a superpower."</p><div class="msg-week">Week 3 of return</div></div></article>
+      <article class="msg-card" style="border-left-color:var(--connection)"><div class="avatar" style="background:var(--connection)" aria-hidden="true">D</div><div><div class="msg-meta"><strong>From: Dev</strong> (engineering)</div><p class="msg-text">"Pairing with you on the API refactor this week reminded me why our best work happens in twos. Really glad to have you back."</p><div class="msg-week">Month 2 of return</div></div></article>
+    </div>
+    <div class="how-box" role="note"><h3>How it works</h3><p>Teammates receive a gentle prompt: <em>"You worked with [name] today. Did you notice something specific they contributed?"</em> Notes are delivered privately to you, not posted publicly. You choose whether to save them in your reflection journal.</p></div>
+  </div>
+
+  
+  <!-- ===== 09D · Tab panel: Milestone Moments ===== -->
+  <div class="tab-panel" id="p-mile" role="tabpanel" aria-labelledby="t-mile">
+    <p class="panel-intro">Non-competitive celebrations at natural checkpoints — acknowledging the emotional journey, not just output.</p>
+    <div class="milestone-story">
+      <aside class="milestone-intro" aria-label="Milestone section introduction">
+        <div class="milestone-kicker">Scroll story</div>
+        <h3>Digital overwhelm is reduced one layer at a time.</h3>
+        <p>Instead of presenting every notification, task, and expectation at once, this section reveals progress gradually as you scroll — so each checkpoint feels like one small moment of clarity in the user’s digital overwhelm journey.</p>
+        <div class="milestone-progress" aria-hidden="true">
+          <div class="milestone-progress-label"><span>Journey progress</span><span id="milestone-progress-value">0%</span></div>
+          <div class="milestone-progress-bar"><div class="milestone-progress-fill"></div></div>
+          <div class="milestone-progress-note" id="milestone-progress-note">Start scrolling to move through the story.</div>
+        </div>
+      </aside>
+      <div class="m-list" id="milestone-story-track" role="list" aria-label="Milestone story timeline">
+        <div class="m-item" role="listitem" data-m-step="01" data-m-label="Arrival">
+          <div class="m-icon-wrap" style="background:#EBF3FA" aria-hidden="true"><i data-lucide="clock-3"></i></div>
+          <div>
+            <div class="m-step"><span class="dot" style="background:var(--tasks)"></span>Arrival · 01</div>
+            <div class="m-title" style="color:var(--tasks)">First week complete</div>
+            <div class="m-quote">“You showed up. That’s the hardest part.”</div>
+            <div class="m-desc">The story begins with presence, not performance. This moment reflects what the employee absorbed, who they met, and what now feels a little less unknown.</div>
+            <div class="m-trigger">Triggered: end of week 1</div>
+          </div>
+        </div>
+        <div class="m-item" role="listitem" data-m-step="02" data-m-label="Momentum">
+          <div class="m-icon-wrap" style="background:#EBF3FA" aria-hidden="true"><i data-lucide="badge-check"></i></div>
+          <div>
+            <div class="m-step"><span class="dot" style="background:var(--tasks)"></span>Momentum · 02</div>
+            <div class="m-title" style="color:var(--tasks)">First contribution</div>
+            <div class="m-quote">“You made something happen.”</div>
+            <div class="m-desc">The second scene turns orientation into action. Even a small finished task becomes evidence that the employee is moving from catching up into contributing.</div>
+            <div class="m-trigger">Triggered: first task closed</div>
+          </div>
+        </div>
+        <div class="m-item" role="listitem" data-m-step="03" data-m-label="Confidence">
+          <div class="m-icon-wrap" style="background:#FDECEA" aria-hidden="true"><i data-lucide="heart"></i></div>
+          <div>
+            <div class="m-step"><span class="dot" style="background:var(--confidence)"></span>Confidence · 03</div>
+            <div class="m-title" style="color:var(--confidence)">Confidence moment</div>
+            <div class="m-quote">“You felt like yourself again.”</div>
+            <div class="m-desc">This is the emotional turning point. The system pauses to recognize an internal shift — a moment where competence stops feeling theoretical and starts feeling real.</div>
+            <div class="m-trigger">Triggered: self-reported in journal</div>
+          </div>
+        </div>
+        <div class="m-item" role="listitem" data-m-step="04" data-m-label="Belonging">
+          <div class="m-icon-wrap" style="background:#F3F0F7" aria-hidden="true"><i data-lucide="handshake"></i></div>
+          <div>
+            <div class="m-step"><span class="dot" style="background:var(--connection)"></span>Belonging · 04</div>
+            <div class="m-title" style="color:var(--connection)">Team moment</div>
+            <div class="m-quote">“You’re not a guest anymore — you’re home.”</div>
+            <div class="m-desc">The narrative widens from self-belief to social ease. Collaboration here is framed as natural belonging, not as a forced act of inclusion.</div>
+            <div class="m-trigger">Triggered: peer-nominated</div>
+          </div>
+        </div>
+        <div class="m-item" role="listitem" data-m-step="05" data-m-label="Renewal">
+          <div class="m-icon-wrap" style="background:#EEF7F2" aria-hidden="true"><i data-lucide="flower-2"></i></div>
+          <div>
+            <div class="m-step"><span class="dot" style="background:var(--knowledge)"></span>Renewal · 05</div>
+            <div class="m-title" style="color:var(--knowledge)">Full bloom</div>
+            <div class="m-quote">“Your garden is complete.”</div>
+            <div class="m-desc">The ending feels reflective rather than noisy. Once all dimensions are in place, the toolkit closes the loop and gently invites the returner to support someone else.</div>
+            <div class="m-trigger">Triggered: all toolkit phases complete</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- ===== 09E · Tab panel: Reflection Prompts ===== -->
+  <div class="tab-panel" id="p-refl" role="tabpanel" aria-labelledby="t-refl">
+    <p class="panel-intro">A private reflection journal tied to each phase of the journey. Add a reflection for the phase you are in, and your check-in will count toward progress while building a simple timeline of your return.</p>
+
+    <section class="reflection-journal-shell">
+      <div class="reflection-journal-header">
+        <div class="reflection-kicker">Reflection journal · Phase-bound check-ins</div>
+        <div class="reflection-phase-summary" id="reflection-phase-summary">0 of 3 phases reflected</div>
+      </div>
+
+      <div class="reflection-composer-card">
+        <div class="reflection-composer-top">
+          <div>
+            <div class="reflection-kicker">New entry</div>
+            <h4>Add a reflection</h4>
+          </div>
+          <div class="reflection-count-badge" id="reflection-entry-count">0 entries</div>
+        </div>
+
+        <div class="reflection-controls">
+          <label class="reflection-label" for="reflection-phase-select">Phase</label>
+          <select id="reflection-phase-select" class="reflection-select" aria-label="Select phase for reflection">
+            <option value="1">Phase 1 · Orient</option>
+            <option value="2">Phase 2 · Rebuild</option>
+            <option value="3">Phase 3 · Own</option>
+          </select>
+        </div>
+
+        <label class="reflection-label" for="reflection-entry-text">Reflection</label>
+        <textarea id="reflection-entry-text" class="reflection-entry-text" placeholder="Write what happened, how you felt, or what this phase is teaching you..."></textarea>
+
+        <div class="reflection-composer-actions">
+          <button class="modal-secondary" type="button" id="reflection-clear-btn">Clear</button>
+          <button class="modal-primary" type="button" id="reflection-save-btn">Save reflection</button>
+        </div>
+      </div>
+
+      <div class="reflection-timeline-wrap">
+        <div class="reflection-timeline-head">
+          <div>
+            <div class="reflection-kicker">Private timeline</div>
+            <h4>Your reflection history</h4>
+          </div>
+          <div class="reflection-timeline-note">Most recent first</div>
+        </div>
+
+        <div class="reflection-empty" id="reflection-empty">
+          No reflections yet. Start with the phase you are currently navigating.
+        </div>
+
+        <div class="reflection-timeline" id="reflection-timeline"></div>
+      </div>
+    </section>
+  </div>
+
+  
+  <!-- ===== 09F · Tab panel: Manager Dashboard ===== -->
+  <div class="tab-panel" id="p-dash" role="tabpanel" aria-labelledby="t-dash" role="tabpanel" aria-labelledby="t-dash">
+    <p class="panel-intro">A lightweight manager view that translates the employee journey into actionable signals. This helps show the service logic behind the experience: managers are not just observers, they are active supports.</p>
+    <div class="manager-layout">
+      <section class="manager-top-row">
+        <div class="manager-hero">
+          <div class="manager-hero-head">
+            <div>
+              <div class="manager-kicker">Suggested manager actions this week</div>
+              <h2 class="manager-hero-title">Support the return with clarity, momentum, and belonging.</h2>
+              <p class="manager-hero-copy">These recommendations are generated from the journey state so your presentation can show how the backend logic turns employee behavior into clear manager guidance.</p>
+            </div>
+            <div class="manager-status-pill"><span class="dot" style="background:var(--phase3)"></span>Live manager view</div>
+          </div>
+          <div class="focus-list" id="focus-list">
+            <div class="focus-item"><div class="focus-dot" style="background:var(--phase1)"></div><div><strong>Start with orientation</strong><div>Reduce ambiguity before assigning urgent work.</div></div></div>
+            <div class="focus-item"><div class="focus-dot" style="background:var(--confidence)"></div><div><strong>Design one quick win</strong><div>Build confidence through evidence, not reassurance alone.</div></div></div>
+            <div class="focus-item"><div class="focus-dot" style="background:var(--connection)"></div><div><strong>Protect social re-entry</strong><div>Use low-pressure 1-on-1s and peer rituals to rebuild belonging.</div></div></div>
+          </div>
+        </div>
+
+        <div class="manager-stats-grid">
+          <article class="dashboard-card">
+            <h3>Current reintegration phase</h3>
+            <div class="dashboard-num" id="dash-phase">Orient</div>
+            <div class="dashboard-note">Updates automatically as the employee explores support cards and writes reflections.</div>
+          </article>
+          <article class="dashboard-card">
+            <h3>Engagement score</h3>
+            <div class="dashboard-num" id="dash-progress">0%</div>
+            <div class="dashboard-note">A soft signal of engagement, not a performance score.</div>
+          </article>
+          <article class="dashboard-card">
+            <h3>Phases with reflection</h3>
+            <div class="dashboard-num" id="dash-reflections">0/3</div>
+            <div class="dashboard-note">Shows whether each phase includes at least one reflection check-in.</div>
+          </article>
+          <article class="dashboard-card">
+            <h3>Cards explored</h3>
+            <div class="dashboard-num" id="dash-cards">0/12</div>
+            <div class="dashboard-note">Shows whether the employee is actually navigating support resources.</div>
+          </article>
+        </div>
+      </section>
+
+      <section class="manager-bottom-row">
+        <div class="manager-panel">
+          <h3>Support dimensions needing attention</h3>
+          <p>Instead of only measuring output, this view shows where support may still be missing across the four dimensions.</p>
+          <div class="bar-stack">
+            <div class="bar-row"><div class="bar-label">Knowledge</div><div class="bar-track"><div class="bar-fill" id="bar-knowledge" style="background:var(--knowledge);width:0%"></div></div><div id="bar-knowledge-val">0%</div></div>
+            <div class="bar-row"><div class="bar-label">Tasks</div><div class="bar-track"><div class="bar-fill" id="bar-tasks" style="background:var(--tasks);width:0%"></div></div><div id="bar-tasks-val">0%</div></div>
+            <div class="bar-row"><div class="bar-label">Confidence</div><div class="bar-track"><div class="bar-fill" id="bar-confidence" style="background:var(--confidence);width:0%"></div></div><div id="bar-confidence-val">0%</div></div>
+            <div class="bar-row"><div class="bar-label">Connection</div><div class="bar-track"><div class="bar-fill" id="bar-connection" style="background:var(--connection);width:0%"></div></div><div id="bar-connection-val">0%</div></div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="focus-card">
+            <h3>What the manager should notice</h3>
+            <p>This feed makes the service logic legible: as engagement changes, the system surfaces which kind of support still needs human follow-through.</p>
+            <div class="rec-list" id="manager-recs"></div>
+          </div>
+        </aside>
+      </section>
+    </div>
+  </div>
+
+  <!-- ===== 09G · Tab panel: About Us ===== -->
+  <div class="tab-panel" id="p-about" role="tabpanel" aria-labelledby="t-about">
+    <p class="panel-intro">A quick look at the design thinking behind Task PAL — what it is, why it exists, and how each feature addresses both the operational need and the emotional experience beneath it.</p>
+    <div class="preview-frame">
+      <div class="preview-top">
+        <div class="preview-kicker">Portfolio preview<strong>Return-to-work experience snapshot</strong></div>
+        <div class="preview-pills" aria-hidden="true"><span></span><span></span><span></span></div>
+      </div>
+      <div class="preview-panel">
+        <div class="preview-card">
+          <h3>A calm system view that makes reintegration visible</h3>
+          <p>The concept translates reintegration into a phased dashboard, so employees can understand where they are, what comes next, and how support unfolds over time.</p>
+          <div class="preview-meta"><span class="preview-tag">3-phase flow</span><span>Designed to reduce overwhelm</span></div>
+        </div>
+        <div class="preview-status-row">
+          <div class="preview-status-card">
+            <div class="preview-status-label">Current phase</div>
+            <div class="preview-progress-head"><span>Phase 2 · Rebuild confidence</span><span>62%</span></div>
+            <div class="preview-progress-bar" aria-hidden="true"><span></span></div>
+            <div class="preview-progress-note"><i data-lucide="sparkles"></i><span>Reflection and manager check-ins are unlocking next.</span></div>
+          </div>
+          <div class="preview-stat-card">
+            <strong>4</strong>
+            <span>support dimensions surfaced in one calm view</span>
+          </div>
+        </div>
+        <div class="preview-grid">
+          <div class="preview-mini">
+            <strong><i data-lucide="book-open"></i> Knowledge</strong>
+            <span>What changed, what to revisit, and what to learn next.</span>
+          </div>
+          <div class="preview-mini">
+            <strong><i data-lucide="check-circle-2"></i> Tasks</strong>
+            <span>Workload returns in steps, with boundaries instead of overload.</span>
+          </div>
+          <div class="preview-mini">
+            <strong><i data-lucide="sparkles"></i> Confidence</strong>
+            <span>Small wins and reflection prompts rebuild self-trust.</span>
+          </div>
+          <div class="preview-mini">
+            <strong><i data-lucide="handshake"></i> Connection</strong>
+            <span>Warm rituals help the employee feel supported and seen again.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer role="contentinfo">
+  <p>Task PAL &nbsp;·&nbsp; Designed with human-centered design thinking</p>
+  <p style="margin-top:3px">Every feature addresses both the operational need and the emotional experience beneath it.</p>
+</footer>
+
+
+<!-- ==================================================
+  "SECTION 10 · TOAST FEEDBACK"
+================================================== -->
+<div class="toast" id="toast" aria-live="polite">Progress saved</div>
+
+
+<!-- ==================================================
+  "SECTION 12 · MAIN APPLICATION LOGIC"
+================================================== -->
+<script>
+
+const STORAGE_KEY = 'reintegration_toolkit_v4_reflection_journal';
+
+const App = {
+  state: {
+    activeTab: 'matrix',
+    fontSize: 16,
+    highContrast: false,
+    visitedCells: [],
+    reflections: {},
+    reflectionEntries: [],
+    progress: 0,
+    phase: 1,
+    week: 1,
+    activeAccordion: 1,
+    unlockedPhase: 1,
+    onboardingStep: 1,
+    onboardingComplete: false
+  },
+
+  phaseMeta: {
+    1: {
+      title: "You're in Phase 1: Orient",
+      copy: "This week is about absorbing, not delivering. Your only job is to get your bearings — the toolkit will guide you through the rest. You are not expected to have all the answers yet.",
+      weekLabel: 'Week 1 of 3',
+      status: 'You are in the early re-entry stage. Focus on understanding changes and lowering pressure.',
+      tip: 'Tip: finish all four quadrants in this phase to unlock Rebuild.'
+    },
+    2: {
+      title: "You're in Phase 2: Rebuild",
+      copy: "You're moving from orientation into momentum. This phase is about rebuilding confidence through manageable action, support, and visible progress.",
+      weekLabel: 'Weeks 2–4',
+      status: 'You are rebuilding rhythm. Small wins and repeated support matter more than speed.',
+      tip: 'Tip: use reflections to capture competent moments, not just challenges.'
+    },
+    3: {
+      title: "You're in Phase 3: Own",
+      copy: "You're no longer just returning — you're shaping what comes next. This phase turns reintegration into ownership, contribution, and future support for others.",
+      weekLabel: 'Month 2+',
+      status: 'You are transitioning into ownership. The experience is now becoming part of your growth story.',
+      tip: 'Tip: look for opportunities to mentor or improve the process for the next returner.'
+    }
+  },
+
+  init(){
+    this.loadState();
+    this.cache();
+    this.bindEvents();
+    this.restoreReflections();
+    this.renderReflectionJournal();
+    this.applyAccessibility();
+    this.activateTab(this.state.activeTab, false);
+    this.renderCells();
+    this.updateProgress(false);
+    this.renderOnboarding();
+    this.setupReveal();
+    this.setupMilestoneStory();
+    if(!this.state.onboardingComplete){ setTimeout(() => this.openWelcomeModal(), 260); }
+  },
+
+  cache(){
+    this.tabs = [...document.querySelectorAll('.nav-tab')];
+    this.panels = [...document.querySelectorAll('.tab-panel')];
+    this.cells = [...document.querySelectorAll('[data-cell]')];
+    this.textareas = [...document.querySelectorAll('.prompt-ta')];
+    this.reflectionTimeline = document.getElementById('reflection-timeline');
+    this.reflectionEmpty = document.getElementById('reflection-empty');
+    this.reflectionPhaseSelect = document.getElementById('reflection-phase-select');
+    this.reflectionEntryText = document.getElementById('reflection-entry-text');
+    this.reflectionSaveBtn = document.getElementById('reflection-save-btn');
+    this.reflectionClearBtn = document.getElementById('reflection-clear-btn');
+    this.reflectionPhaseSummary = document.getElementById('reflection-phase-summary');
+    this.reflectionEntryCount = document.getElementById('reflection-entry-count');
+    this.phaseSections = [...document.querySelectorAll('.phase-section')];
+    this.phaseFlow = document.getElementById('phase-flow');
+    this.phaseNavPills = [...document.querySelectorAll('[data-phase-jump]')];
+    this.phasePrevBtn = document.getElementById('phase-prev');
+    this.phaseNextBtn = document.getElementById('phase-next');
+    this.phaseNavStatus = document.getElementById('phase-nav-status');
+    this.phaseProgressFill = document.getElementById('phase-progress-fill');
+    this.phaseTitle = document.getElementById('phase-title');
+    this.phaseCopy = document.getElementById('phase-copy');
+    this.weekLabel = document.getElementById('week-label');
+    this.ring = document.getElementById('ring');
+    this.ringNum = document.getElementById('ring-num');
+    this.progressStrip = document.getElementById('progress-strip-fill');
+    this.status = document.getElementById('journey-status');
+    this.tip = document.getElementById('journey-tip');
+    this.toast = document.getElementById('toast');
+    this.modal = document.getElementById('welcome-modal');
+    this.openModalBtn = document.getElementById('open-welcome-modal');
+    this.closeModalBtn = document.getElementById('close-welcome-modal');
+    this.modalStartBtn = document.getElementById('welcome-start');
+    this.modalJumpReflectionBtn = document.getElementById('welcome-jump-reflection');
+    this.signalCards = document.getElementById('signal-cards');
+    this.signalReflections = document.getElementById('signal-reflections');
+    this.signalNeed = document.getElementById('signal-need');
+    this.dashPhase = document.getElementById('dash-phase');
+    this.dashProgress = document.getElementById('dash-progress');
+    this.dashReflections = document.getElementById('dash-reflections');
+    this.dashCards = document.getElementById('dash-cards');
+    this.managerRecs = document.getElementById('manager-recs');
+    this.onboardSteps = [...document.querySelectorAll('[data-onboard-step]')];
+    this.onboardPills = [...document.querySelectorAll('[data-onboard-pill]')];
+    this.onboardBackBtn = document.getElementById('onboard-back');
+    this.onboardNextBtn = document.getElementById('onboard-next');
+    this.onboardSkipBtn = document.getElementById('onboard-skip');
+    this.onboardPhaseStatus = document.getElementById('onboard-phase-status');
+    this.onboardProgressCount = document.getElementById('onboard-progress-count');
+    this.milestoneStory = document.getElementById('milestone-story-track');
+    this.milestoneItems = [...document.querySelectorAll('#milestone-story-track .m-item')];
+    this.milestoneProgressValue = document.getElementById('milestone-progress-value');
+    this.milestoneProgressNote = document.getElementById('milestone-progress-note');
+  },
+
+  setupReveal(){
+    const els = document.querySelectorAll('.fade-in-up');
+    if(!('IntersectionObserver' in window)){
+      els.forEach(el => el.classList.add('visible'));
+      return;
+    }
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, {threshold:.12});
+    els.forEach(el => io.observe(el));
+  },
+
+  setupMilestoneStory(){
+    if(!this.milestoneStory || !this.milestoneItems.length) return;
+
+    const labels = this.milestoneItems.map(item => item.dataset.mLabel || item.querySelector('.m-title')?.textContent?.trim() || 'Milestone');
+    const update = () => {
+      const rect = this.milestoneStory.getBoundingClientRect();
+      const viewport = window.innerHeight || document.documentElement.clientHeight;
+      const total = Math.max(rect.height - viewport * 0.55, 1);
+      const raw = (viewport * 0.62 - rect.top) / total;
+      const progress = Math.max(0, Math.min(1, raw));
+      this.milestoneStory.style.setProperty('--milestone-progress', `${Math.round(progress * 100)}%`);
+      this.milestoneStory.style.setProperty('--milestone-line-scale', progress.toFixed(4));
+
+      const activeIndex = Math.max(0, Math.min(this.milestoneItems.length - 1, Math.round(progress * (this.milestoneItems.length - 1))));
+      this.milestoneItems.forEach((item, index) => {
+        item.classList.toggle('is-visible', progress > (index / this.milestoneItems.length) - 0.08);
+        item.classList.toggle('is-active', index === activeIndex);
+      });
+
+      if(this.milestoneProgressValue){
+        this.milestoneProgressValue.textContent = `${Math.round(progress * 100)}%`;
+      }
+      if(this.milestoneProgressNote){
+        this.milestoneProgressNote.textContent = progress <= 0.03
+          ? 'Start scrolling to move through the story.'
+          : progress >= 0.97
+            ? 'Story complete — the journey lands on renewal.'
+            : `Current scene: ${labels[activeIndex]}.`;
+      }
+    };
+
+    let ticking = false;
+    const onScroll = () => {
+      if(ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        update();
+        ticking = false;
+      });
+    };
+
+    update();
+    window.addEventListener('scroll', onScroll, {passive:true});
+    window.addEventListener('resize', onScroll);
+  },
+
+  bindEvents(){
+    this.tabs.forEach(btn => btn.addEventListener('click', () => this.activateTab(btn.dataset.tab, true)));
+
+    this.cells.forEach(cell => {
+      cell.addEventListener('click', () => this.exploreCell(cell));
+      cell.addEventListener('keydown', e => {
+        if(e.key === 'Enter' || e.key === ' '){
+          e.preventDefault();
+          this.exploreCell(cell);
+        }
+      });
+    });
+
+    document.querySelectorAll('.phase-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.shiftPhase(1);
+      });
+    });
+    this.phaseNavPills.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if(this._phaseAnimating) return;
+        this.choosePhase(Number(btn.dataset.phaseJump), true);
+      });
+    });
+    this.phasePrevBtn?.addEventListener('click', () => {
+      if(this._phaseAnimating) return;
+      this.shiftPhase(-1);
+    });
+    this.phaseNextBtn?.addEventListener('click', () => {
+      if(this._phaseAnimating) return;
+      this.shiftPhase(1);
+    });
+
+    this.textareas.forEach(ta => ta.addEventListener('input', e => this.saveReflection(e.target)));
+    this.reflectionSaveBtn?.addEventListener('click', () => this.addReflectionEntry());
+    this.reflectionClearBtn?.addEventListener('click', () => { if(this.reflectionEntryText) this.reflectionEntryText.value = ''; });
+
+    document.getElementById('font-up').addEventListener('click', () => this.setFontSize(this.state.fontSize + 1));
+    document.getElementById('font-down').addEventListener('click', () => this.setFontSize(this.state.fontSize - 1));
+    document.getElementById('hc-btn').addEventListener('click', () => this.toggleContrast());
+
+    this.openModalBtn?.addEventListener('click', () => this.openWelcomeModal());
+    this.closeModalBtn?.addEventListener('click', () => this.closeWelcomeModal());
+    this.modalStartBtn?.addEventListener('click', () => { this.state.onboardingComplete = true; this.persist(); this.closeWelcomeModal(); });
+    this.onboardNextBtn?.addEventListener('click', () => this.goOnboardingStep(1));
+    this.onboardBackBtn?.addEventListener('click', () => this.goOnboardingStep(-1));
+    this.onboardSkipBtn?.addEventListener('click', () => { this.state.onboardingComplete = true; this.persist(); this.closeWelcomeModal(); });
+    this.modalJumpReflectionBtn?.addEventListener('click', () => {
+      this.state.onboardingComplete = true;
+      this.persist();
+      this.closeWelcomeModal();
+      this.activateTab('refl', true);
+      document.getElementById('p-refl')?.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+    this.modal?.addEventListener('click', (e) => { if(e.target === this.modal) this.closeWelcomeModal(); });
+    document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && this.modal?.classList.contains('open')) this.closeWelcomeModal(); });
+
+    document.getElementById('jump-dashboard')?.addEventListener('click', () => {
+      this.activateTab('dash', true);
+      document.getElementById('p-dash')?.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+    document.getElementById('jump-reflection')?.addEventListener('click', () => {
+      this.activateTab('refl', true);
+      document.getElementById('p-refl')?.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  },
+
+  openWelcomeModal(){
+    if(!this.modal) return;
+    if(this.state.onboardingStep < 1 || this.state.onboardingStep > 3) this.state.onboardingStep = 1;
+    this.renderOnboarding();
+    this.modal.classList.add('open');
+    this.modal.setAttribute('aria-hidden','false');
+    document.body.classList.add('modal-open');
+    this.closeModalBtn?.focus();
+  },
+
+  closeWelcomeModal(){
+    if(!this.modal) return;
+    this.modal.classList.remove('open');
+    this.modal.setAttribute('aria-hidden','true');
+    document.body.classList.remove('modal-open');
+    this.openModalBtn?.focus();
+  },
+
+
+
+  goOnboardingStep(delta){
+    const next = Math.max(1, Math.min(3, this.state.onboardingStep + delta));
+    this.state.onboardingStep = next;
+    this.renderOnboarding();
+    this.persist();
+  },
+
+  renderOnboarding(){
+    const step = this.state.onboardingStep || 1;
+    this.onboardSteps?.forEach(el => el.classList.toggle('active', Number(el.dataset.onboardStep) === step));
+    this.onboardPills?.forEach(el => {
+      const n = Number(el.dataset.onboardPill);
+      el.classList.toggle('active', n === step);
+      el.classList.toggle('done', n < step);
+    });
+    const line1 = document.getElementById('onboard-line-1');
+    const line2 = document.getElementById('onboard-line-2');
+    if(line1) line1.style.setProperty('--fill', step > 1 ? '1' : '0');
+    if(line2) line2.style.setProperty('--fill', step > 2 ? '1' : '0');
+    if(this.onboardBackBtn) this.onboardBackBtn.style.visibility = step === 1 ? 'hidden' : 'visible';
+    if(this.onboardNextBtn) this.onboardNextBtn.style.display = step === 3 ? 'none' : 'inline-flex';
+    if(this.modalStartBtn) this.modalStartBtn.style.display = step === 3 ? 'inline-flex' : 'none';
+  },
+
+  loadState(){
+    try{
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if(saved && typeof saved === 'object') this.state = {...this.state, ...saved};
+    }catch(err){ console.warn('Could not load saved state', err); }
+  },
+
+  persist(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state)); },
+
+  activateTab(id, save = true){
+    this.tabs.forEach(t => {
+      const active = t.dataset.tab === id;
+      t.classList.toggle('active', active);
+      t.setAttribute('aria-selected', String(active));
+    });
+    this.panels.forEach(p => p.classList.toggle('active', p.id === 'p-' + id));
+    this.state.activeTab = id;
+    if(save) this.persist();
+  },
+
+  getPhaseCells(phase){ return this.cells.filter(cell => Number(cell.dataset.phaseIndex) === phase); },
+  getPhaseCount(phase){ return this.getPhaseCells(phase).filter(cell => this.state.visitedCells.includes(cell.dataset.cell)).length; },
+  isPhaseComplete(phase){ return this.getPhaseCount(phase) === 4; },
+
+
+  choosePhase(phase, userInitiated = false){
+    const unlocked = this.getUnlockedPhase();
+    if(phase > unlocked){
+      if(userInitiated) this.showToast(`Complete Phase ${phase-1} to unlock this section`);
+      return;
+    }
+    this.state.activeAccordion = Math.max(1, Math.min(phase, unlocked));
+    this.renderAccordions();
+    this.persist();
+  },
+
+  shiftPhase(direction){
+    const unlocked = this.getUnlockedPhase();
+    const next = Math.max(1, Math.min(unlocked, (this.state.activeAccordion || 1) + direction));
+    this.state.activeAccordion = next;
+    this.renderAccordions();
+    this.persist();
+  },
+
+  getUnlockedPhase(){
+    let unlocked = 1;
+    if(this.isPhaseComplete(1)) unlocked = 2;
+    if(this.isPhaseComplete(1) && this.isPhaseComplete(2)) unlocked = 3;
+    return unlocked;
+  },
+
+  toggleAccordion(phase, userInitiated = false){
+    this.choosePhase(phase, userInitiated);
+  },
+
+  renderAccordions(){
+    const unlocked = this.getUnlockedPhase();
+    if(this.state.activeAccordion > unlocked || !this.state.activeAccordion){
+      this.state.activeAccordion = unlocked;
+    }
+
+    const nextPhase = this.state.activeAccordion;
+    const previousPhase = this._renderedActivePhase ?? nextPhase;
+
+    this.phaseSections.forEach(section => {
+      const phase = Number(section.dataset.phase);
+      section.classList.toggle('expanded', phase === nextPhase && phase <= unlocked);
+
+      const chip = document.getElementById(`phase-chip-${phase}`);
+      const prog = document.getElementById(`phase-progress-${phase}`);
+      const count = this.getPhaseCount(phase);
+
+      if(prog) prog.textContent = `${count} / 4 explored`;
+      if(chip){
+        chip.className = 'phase-chip';
+        if(phase > unlocked){ chip.classList.add('locked'); chip.textContent = 'Locked'; }
+        else if(this.isPhaseComplete(phase)){ chip.classList.add('complete'); chip.textContent = 'Complete'; }
+        else { chip.textContent = 'Unlocked'; }
+      }
+    });
+
+    if(previousPhase === nextPhase){
+      this.phaseSections.forEach(section => {
+        const phase = Number(section.dataset.phase);
+        section.classList.toggle('active-slide', phase === nextPhase);
+        section.classList.remove('animating-in','animating-out','slide-in-right','slide-in-left','slide-out-left','slide-out-right');
+      });
+    } else {
+      const prevSection = this.phaseSections.find(section => Number(section.dataset.phase) === previousPhase);
+      const nextSection = this.phaseSections.find(section => Number(section.dataset.phase) === nextPhase);
+      const directionClassIn = nextPhase > previousPhase ? 'slide-in-right' : 'slide-in-left';
+      const directionClassOut = nextPhase > previousPhase ? 'slide-out-left' : 'slide-out-right';
+
+      this.phaseSections.forEach(section => {
+        const phase = Number(section.dataset.phase);
+        if(phase !== previousPhase && phase !== nextPhase){
+          section.classList.remove('active-slide','animating-in','animating-out','slide-in-right','slide-in-left','slide-out-left','slide-out-right');
+        }
+      });
+
+      if(this.phaseFlow && prevSection && nextSection){
+        clearTimeout(this.phaseAnimationTimer);
+        const incomingH = nextSection.offsetHeight || prevSection.offsetHeight;
+        this.phaseFlow.style.minHeight = `${incomingH}px`;
+        prevSection.classList.add('active-slide','animating-out',directionClassOut);
+        prevSection.classList.remove('animating-in','slide-in-right','slide-in-left');
+        nextSection.classList.add('active-slide','animating-in',directionClassIn);
+        nextSection.classList.remove('animating-out','slide-out-left','slide-out-right');
+        this._phaseAnimating = true;
+        this.phaseAnimationTimer = setTimeout(() => {
+          prevSection.classList.remove('active-slide','animating-out','slide-out-left','slide-out-right');
+          nextSection.classList.remove('animating-in','slide-in-right','slide-in-left');
+          if(this.phaseFlow) this.phaseFlow.style.minHeight = '';
+          this._phaseAnimating = false;
+        }, 340);
+      }
+    }
+
+    this.phaseNavPills.forEach(btn => {
+      const phase = Number(btn.dataset.phaseJump);
+      const isActive = phase === nextPhase;
+      btn.classList.toggle('active', isActive);
+      btn.classList.toggle('locked', phase > unlocked);
+      btn.setAttribute('aria-selected', String(isActive));
+      btn.disabled = phase > unlocked;
+    });
+
+    if(this.phasePrevBtn) this.phasePrevBtn.disabled = nextPhase <= 1;
+    if(this.phaseNextBtn) this.phaseNextBtn.disabled = nextPhase >= unlocked;
+
+    const phaseLabels = {
+      1: 'Phase 1 of 3 · Orient',
+      2: 'Phase 2 of 3 · Rebuild',
+      3: 'Phase 3 of 3 · Own'
+    };
+    if(this.phaseNavStatus) this.phaseNavStatus.textContent = phaseLabels[nextPhase] || 'Phase journey';
+    if(this.phaseProgressFill){
+      const widthMap = {1:'33.333%', 2:'66.666%', 3:'100%'};
+      this.phaseProgressFill.style.width = widthMap[nextPhase] || '33.333%';
+    }
+
+    this._renderedActivePhase = nextPhase;
+
+    if(this.reflectionPhaseSelect) this.reflectionPhaseSelect.value = String(this.getCurrentPhaseForReflection());
+  },
+
+  exploreCell(cell){
+    const phase = Number(cell.dataset.phaseIndex);
+    if(phase > this.getUnlockedPhase()){
+      this.showToast(`Complete Phase ${phase-1} to unlock this quadrant`);
+      return;
+    }
+    const id = cell.dataset.cell;
+    if(!this.state.visitedCells.includes(id)){
+      this.state.visitedCells.push(id);
+      cell.classList.add('visited','completed');
+      const status = cell.querySelector('.quadrant-status');
+      if(status) status.textContent = 'Explored';
+      this.showToast('Quadrant marked as explored');
+    }
+
+    const previouslyUnlocked = this.state.unlockedPhase;
+    this.state.unlockedPhase = this.getUnlockedPhase();
+    if(this.state.unlockedPhase > previouslyUnlocked){
+      this.state.activeAccordion = this.state.unlockedPhase;
+      this.showToast(`Phase ${this.state.unlockedPhase} unlocked`);
+    } else {
+      this.state.activeAccordion = phase;
+    }
+    this.renderCells();
+    this.updateProgress();
+    this.persist();
+  },
+
+  renderCells(){
+    this.cells.forEach(cell => {
+      const visited = this.state.visitedCells.includes(cell.dataset.cell);
+      cell.classList.toggle('visited', visited);
+      cell.classList.toggle('completed', visited);
+      const status = cell.querySelector('.quadrant-status');
+      if(status) status.textContent = visited ? 'Explored' : 'Not explored';
+    });
+    this.renderAccordions();
+  },
+
+getReflectedPhasesCount(){
+    return new Set((this.state.reflectionEntries || []).map(entry => Number(entry.phase))).size;
+  },
+
+  getReflectionEntryCount(){
+    return (this.state.reflectionEntries || []).length;
+  },
+
+  getCurrentPhaseForReflection(){
+    return this.state.activeAccordion || this.state.phase || 1;
+  },
+
+  formatReflectionTimestamp(ts){
+    const d = new Date(ts);
+    return d.toLocaleDateString(undefined, {month:'short', day:'numeric'}) + ' · ' +
+      d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+  },
+
+  phaseBadgeMeta(phase){
+    const map = {
+      1: {label:'Phase 1 · Orient', color:'var(--phase1)', note:'Orientation check-in'},
+      2: {label:'Phase 2 · Rebuild', color:'var(--phase2)', note:'Momentum check-in'},
+      3: {label:'Phase 3 · Own', color:'var(--phase3)', note:'Forward-looking check-in'}
+    };
+    return map[phase] || map[1];
+  },
+
+  renderReflectionJournal(){
+    if(!this.reflectionTimeline) return;
+    const entries = [...(this.state.reflectionEntries || [])].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const reflectedPhases = this.getReflectedPhasesCount();
+    const totalEntries = this.getReflectionEntryCount();
+
+    if(this.reflectionPhaseSelect){
+      this.reflectionPhaseSelect.value = String(this.getCurrentPhaseForReflection());
+    }
+    if(this.reflectionPhaseSummary){
+      this.reflectionPhaseSummary.textContent = `${reflectedPhases} of 3 phases reflected`;
+    }
+    if(this.reflectionEntryCount){
+      this.reflectionEntryCount.textContent = `${totalEntries} ${totalEntries === 1 ? 'entry' : 'entries'}`;
+    }
+    this.reflectionEmpty?.classList.toggle('hidden', entries.length > 0);
+
+    this.reflectionTimeline.innerHTML = entries.map(entry => {
+      const meta = this.phaseBadgeMeta(Number(entry.phase));
+      return `
+        <article class="reflection-timeline-item">
+          <div class="reflection-timeline-phase">
+            <span class="reflection-phase-dot" style="background:${meta.color}"></span>
+            <span class="reflection-phase-chip">${meta.label}</span>
+            <div class="reflection-timestamp">${this.formatReflectionTimestamp(entry.createdAt)}</div>
+          </div>
+          <div class="reflection-entry-card">
+            <div class="reflection-entry-meta">
+              <div class="reflection-entry-title">${meta.note}</div>
+              <button class="reflection-delete-btn" data-entry-id="${entry.id}" aria-label="Delete entry" title="Delete">×</button>
+            </div>
+            <div class="reflection-entry-body">${entry.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    this.reflectionTimeline.querySelectorAll('.reflection-delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => this.deleteReflectionEntry(btn.dataset.entryId));
+    });
+  },
+
+  addReflectionEntry(){
+    if(!this.reflectionPhaseSelect || !this.reflectionEntryText) return;
+    const text = this.reflectionEntryText.value.trim();
+    if(!text){
+      this.showToast('Write a reflection before saving');
+      return;
+    }
+    const phase = Number(this.reflectionPhaseSelect.value);
+    this.state.reflectionEntries = this.state.reflectionEntries || [];
+    this.state.reflectionEntries.unshift({
+      id: `${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
+      phase,
+      text,
+      createdAt: new Date().toISOString()
+    });
+    this.reflectionEntryText.value = '';
+    this.renderReflectionJournal();
+    this.updateProgress();
+    this.flashSaved(this.reflectionSaveBtn);
+    this.showToast(`Saved a reflection for ${this.phaseBadgeMeta(phase).label}`);
+  },
+
+  deleteReflectionEntry(id){
+    if(!id) return;
+    this.state.reflectionEntries = (this.state.reflectionEntries || []).filter(e => e.id !== id);
+    this.renderReflectionJournal();
+    this.updateProgress();
+    this.persist();
+    this.showToast('Reflection deleted');
+  },
+
+  restoreReflections(){
+    this.textareas.forEach(ta => {
+      const key = ta.dataset.reflection;
+      ta.value = this.state.reflections[key] || '';
+    });
+    if(!Array.isArray(this.state.reflectionEntries)) this.state.reflectionEntries = [];
+  },
+
+  saveReflection(ta){
+    const key = ta.dataset.reflection;
+    this.state.reflections[key] = ta.value;
+    this.persist();
+    this.updateProgress();
+    this.flashSaved(ta);
+  },
+
+  flashSaved(ta){
+    const badge = ta.closest('.prompt-card')?.querySelector('.prompt-save');
+    if(!badge) return;
+    badge.classList.add('show');
+    clearTimeout(badge._timer);
+    badge._timer = setTimeout(() => badge.classList.remove('show'), 1200);
+  },
+
+  setFontSize(size){
+    this.state.fontSize = Math.max(13, Math.min(22, size));
+    const scale = this.state.fontSize / 16;
+    document.documentElement.style.setProperty('--font-scale', scale.toFixed(3));
+    this.persist();
+  },
+
+  toggleContrast(){ this.state.highContrast = !this.state.highContrast; this.applyAccessibility(); this.persist(); },
+
+  applyAccessibility(){
+    const scale = (this.state.fontSize || 16) / 16;
+    document.documentElement.style.setProperty('--font-scale', scale.toFixed(3));
+    document.body.classList.toggle('hc', this.state.highContrast);
+    const btn = document.getElementById('hc-btn');
+    btn.textContent = this.state.highContrast ? '☀' : '◑';
+    btn.setAttribute('aria-pressed', String(this.state.highContrast));
+  },
+
+  updateProgress(save = true){
+    const viewed = this.state.visitedCells.length;
+    const written = Object.values(this.state.reflections).filter(v => v && v.trim().length > 0).length;
+    const phaseCompletions = [1,2,3].filter(p => this.isPhaseComplete(p)).length;
+    this.state.unlockedPhase = this.getUnlockedPhase();
+    this.state.phase = phaseCompletions >= 2 ? 3 : phaseCompletions >= 1 ? 2 : 1;
+    this.state.week = this.state.phase;
+    this.state.progress = Math.min(100, Math.round((viewed / 12) * 80 + (written / 6) * 20));
+
+    const circ = 2 * Math.PI * 27;
+    this.ring.style.strokeDashoffset = String(circ * (1 - this.state.progress / 100));
+    this.ringNum.textContent = this.state.progress + '%';
+    this.progressStrip.style.width = this.state.progress + '%';
+
+    const phaseColor = this.state.phase === 1 ? 'var(--phase1)' : this.state.phase === 2 ? 'var(--phase2)' : 'var(--phase3)';
+    this.ring.style.stroke = phaseColor;
+    this.ringNum.style.color = phaseColor;
+    this.progressStrip.style.background = phaseColor;
+
+    this.renderPhaseMeta();
+    this.renderReflectionJournal();
+    this.updateDashboard();
+    if(save) this.persist();
+  },
+
+  renderPhaseMeta(){
+    const meta = this.phaseMeta[this.state.phase];
+    this.phaseTitle.textContent = meta.title;
+    this.phaseCopy.textContent = meta.copy;
+    this.weekLabel.textContent = meta.weekLabel;
+    const viewed = this.state.visitedCells.length;
+    const reflectedPhases = this.getReflectedPhasesCount();
+    const entryCount = this.getReflectionEntryCount();
+    const completedPhases = [1,2,3].filter(p => this.isPhaseComplete(p)).length;
+    const customStatus = viewed === 0 && entryCount === 0
+      ? 'Open the four quadrants in Phase 1 and add a reflection to begin the journey.'
+      : `You've explored ${viewed} of 12 quadrants, completed ${completedPhases} of 3 phases, and logged reflections for ${reflectedPhases} of 3 phases.`;
+    this.status.textContent = customStatus + ' ' + meta.status;
+    this.tip.textContent = meta.tip;
+    if(this.onboardPhaseStatus) this.onboardPhaseStatus.textContent = meta.status;
+    if(this.onboardProgressCount) this.onboardProgressCount.textContent = this.state.progress + '%';
+
+    document.querySelectorAll('[data-phase-badge]').forEach(el => {
+      const phase = Number(el.dataset.phaseBadge);
+      const active = phase === this.state.phase;
+      el.classList.toggle('active', active);
+      el.classList.toggle('up', !active);
+      if(phase === 1) el.textContent = active ? '● Phase 1: Orient — Week 1' : '○ Phase 1: Orient';
+      if(phase === 2) el.textContent = active ? '● Phase 2: Rebuild' : '○ Phase 2: Rebuild';
+      if(phase === 3) el.textContent = active ? '● Phase 3: Own' : '○ Phase 3: Own';
+      if(active) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current');
+    });
+  },
+
+  updateDashboard(){
+    const reflections = this.getReflectedPhasesCount();
+    const reflectionEntries = this.getReflectionEntryCount();
+    const cards = this.state.visitedCells.length;
+    const scores = {knowledge:0,tasks:0,confidence:0,connection:0};
+    this.state.visitedCells.forEach(key => {
+      const dim = key.split('-')[1];
+      if(scores[dim] !== undefined) scores[dim] += 1;
+    });
+    Object.keys(scores).forEach(key => scores[key] = Math.round((scores[key] / 3) * 100));
+
+    if(this.signalCards) this.signalCards.textContent = `${cards} / 12`;
+    if(this.signalReflections) this.signalReflections.textContent = `${reflections} / 3`;
+    const weakestKey = Object.entries(scores).sort((a,b)=>a[1]-b[1])[0][0];
+    if(this.signalNeed) this.signalNeed.textContent = weakestKey.charAt(0).toUpperCase() + weakestKey.slice(1);
+
+    if(this.dashPhase) this.dashPhase.textContent = this.phaseMeta[this.state.phase].title.replace("You're in ", '');
+    if(this.dashProgress) this.dashProgress.textContent = this.state.progress + '%';
+    if(this.dashReflections) this.dashReflections.textContent = `${reflections}/3`;
+    if(this.dashCards) this.dashCards.textContent = `${cards}/12`;
+
+    ['knowledge','tasks','confidence','connection'].forEach(key => {
+      const fill = document.getElementById('bar-'+key);
+      const val = document.getElementById('bar-'+key+'-val');
+      if(fill) fill.style.width = scores[key] + '%';
+      if(val) val.textContent = scores[key] + '%';
+    });
+
+    const recMap = {
+      knowledge: ['Clarify what changed', 'Offer a low-pressure walkthrough of new tools and team norms.'],
+      tasks: ['Adjust workload ramp', 'Keep the next assignment bounded and easy to finish.'],
+      confidence: ['Create a quick win', 'Give one task designed to produce visible evidence of competence.'],
+      connection: ['Rebuild belonging', 'Use peer rituals and low-stakes collaboration to re-open team trust.']
+    };
+    const strongestKey = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+    if(this.managerRecs){
+      this.managerRecs.innerHTML = `
+        <div class="rec-item"><strong>Primary action: ${recMap[weakestKey][0]}</strong><span>${recMap[weakestKey][1]}</span></div>
+        <div class="rec-item"><strong>Current strength: ${strongestKey.charAt(0).toUpperCase()+strongestKey.slice(1)}</strong><span>This is where the employee has engaged most so far. Use it as an anchor while supporting weaker dimensions.</span></div>
+        <div class="rec-item"><strong>Facilitation reminder</strong><span>Treat these metrics as support signals, not performance surveillance. The goal is humane reintegration.</span></div>`;
+    }
+  },
+
+  showToast(message){
+    if(!this.toast) return;
+    this.toast.textContent = message;
+    this.toast.classList.add('show');
+    clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => this.toast.classList.remove('show'), 1400);
+  }
+};
+
+window.addEventListener('load', () => App.init());
+
+</script>
+
+<!-- ==================================================
+  "SECTION 13 · ICON INITIALIZATION"
+================================================== -->
+<script>if (window.lucide) { lucide.createIcons(); }</script>
+
+
+
+<!-- ==================================================
+  END OF DOCUMENT
+================================================== -->
+</body>
+</html>
